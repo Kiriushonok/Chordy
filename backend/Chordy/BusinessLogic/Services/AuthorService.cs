@@ -15,5 +15,41 @@ namespace Chordy.BusinessLogic.Services
             await authorRepository.CreateAsync(author, cancellationToken);
             return author;
         }
+
+        public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var author = await authorRepository.GetByIdAsync(id, cancellationToken);
+
+            if (author == null)
+            {
+                throw new Exception("Author not found");
+            }
+
+            await authorRepository.DeleteAsync(author, cancellationToken);
+        }
+
+        public async Task<string> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var author = await authorRepository.GetByIdAsync(id, cancellationToken);
+
+            if (author == null) {
+                throw new Exception("Author not found");
+            }
+
+            return author.name;
+        }
+
+        public async Task UpdateAsync(int id, string newName, CancellationToken cancellationToken = default)
+        {
+            var author = await authorRepository.GetByIdAsync(id, cancellationToken);
+
+            if (author == null)
+            {
+                throw new Exception("Author not found");
+            }
+
+            author.name = newName;
+            await authorRepository.UpdateAsync(author, cancellationToken);
+        }
     }
 }
