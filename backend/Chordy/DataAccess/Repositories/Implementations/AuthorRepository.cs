@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Chordy.DataAccess.Repositories.Implementations
 {
-    internal class AuthorRepository(AppContext context) : IAuthorRepository
+    internal class AuthorRepository(ChordyDbContext context) : IAuthorRepository
     {
         public async Task CreateAsync(Author author, CancellationToken cancellationToken = default)
         {

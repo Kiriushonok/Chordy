@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Chordy.DataAccess
 {
-    public class AppContext(DbContextOptions<AppContext> options) : DbContext(options)
+    public class ChordyDbContext(DbContextOptions<ChordyDbContext> options) : DbContext(options)
     {
         public DbSet<Author> authors { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -4,7 +4,7 @@ using Chordy.DataAccess.Repositories.Interfaces;
 
 namespace Chordy.BusinessLogic.Services
 {
-    internal class AuthorService(IAuthorRepository authorRepository) : IAuthorService
+    internal class AuthorService(IAuthorRepository authorRepository, ILogger<AuthorService> logger) : IAuthorService
     {
         public async Task<Author> CreateAsync(string name, CancellationToken cancellationToken = default)
         {
@@ -22,7 +22,8 @@ namespace Chordy.BusinessLogic.Services
 
             if (author == null)
             {
-                throw new Exception("Author not found");
+                logger.LogWarning("Автор с ID {id} не найден", id);
+                throw new KeyNotFoundException($"Автор с ID {id} не найден");
             }
 
             await authorRepository.DeleteAsync(author, cancellationToken);
@@ -32,8 +33,10 @@ namespace Chordy.BusinessLogic.Services
         {
             var author = await authorRepository.GetByIdAsync(id, cancellationToken);
 
-            if (author == null) {
-                throw new Exception("Author not found");
+            if (author == null)
+            {
+                logger.LogWarning("Автор с ID {id} не найден", id);
+                throw new KeyNotFoundException($"Автор с ID {id} не найден");
             }
 
             return author.name;
@@ -45,7 +48,8 @@ namespace Chordy.BusinessLogic.Services
 
             if (author == null)
             {
-                throw new Exception("Author not found");
+                logger.LogWarning("Автор с ID {id} не найден", id);
+                throw new KeyNotFoundException($"Автор с ID {id} не найден");
             }
 
             author.name = newName;

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Chordy.WebApi.Models
+namespace Chordy.BusinessLogic.Models
 {
     public class AuthorDto
     {
