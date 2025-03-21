@@ -1,4 +1,4 @@
-﻿namespace Chordy.DataAccess
+﻿namespace Chordy.DataAccess.Entities
 {
     public class Author
     {

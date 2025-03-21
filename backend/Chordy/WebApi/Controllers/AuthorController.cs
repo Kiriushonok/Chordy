@@ -1,4 +1,5 @@
-﻿using Chordy.BusinessLogic;
+﻿using Chordy.BusinessLogic.Interfaces;
+using Chordy.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Chordy.WebApi.Controllers
@@ -8,10 +9,10 @@ namespace Chordy.WebApi.Controllers
     public class AuthorController(IAuthorService authorService) : ControllerBase
     {
         [HttpPost]
-        public async Task<IActionResult> CreateAsync(string name)
+        public async Task<IActionResult> CreateAsync([FromBody] AuthorDto authorDto)
         {
-            await authorService.CreateAsync(name);
-            return NoContent();
+            var author = await authorService.CreateAsync(authorDto.Name);
+            return CreatedAtAction(nameof(CreateAsync), new { id = author.id }, author);
         }
     }
 }

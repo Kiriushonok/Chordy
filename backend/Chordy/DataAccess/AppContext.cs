@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Chordy.DataAccess.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Chordy.DataAccess
 {

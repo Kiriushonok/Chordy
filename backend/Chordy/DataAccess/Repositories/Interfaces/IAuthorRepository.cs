@@ -1,4 +1,6 @@
-﻿namespace Chordy.DataAccess
+﻿using Chordy.DataAccess.Entities;
+
+namespace Chordy.DataAccess.Repositories.Interfaces
 {
     public interface IAuthorRepository
     {
