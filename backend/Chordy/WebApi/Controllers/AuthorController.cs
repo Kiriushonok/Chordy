@@ -13,58 +13,36 @@ namespace Chordy.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAuthorAsync([FromBody] AuthorDto authorDto, CancellationToken cancellationToken)
         {
-            try {
-
             var author = await authorService.CreateAsync(authorDto.Name, cancellationToken);
             return Created($"/Author/{author.id}", author.name);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Ошибка при создании автора: {ErrorMessage}", ex.Message);
-                return Problem("Произошла ошибка при создании автора", statusCode: 500);
-            }
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetAuthorAsync([FromRoute] int id, CancellationToken cancellationToken)
+        [HttpGet("by-id/{id:int}")]
+        public async Task<IActionResult> GetByIdAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
-            try
-            {
-                var authorName = await authorService.GetByIdAsync(id, cancellationToken);
+                var authorName = await authorService.GetAuthorNameByIdAsync(id, cancellationToken);
                 return Ok(authorName);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
+        }
+
+        [HttpGet("by-name/{name}")]
+        public async Task<IActionResult> GetAuthorByNameAsync([FromRoute] string name, CancellationToken cancellationToken)
+        {
+            var authorName = await authorService.GetByNameAsync(name, cancellationToken);
+            return Ok(authorName);
         }
 
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateAuthorAsync([FromRoute] int id, [FromBody] string newText, CancellationToken cancellationToken)
         {
-            try
-            {
                 await authorService.UpdateAsync(id, newText, cancellationToken);
                 return NoContent();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAuthorAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
-            try
-            {
                 await authorService.DeleteAsync(id, cancellationToken);
                 return NoContent();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
         }
     }
 }
