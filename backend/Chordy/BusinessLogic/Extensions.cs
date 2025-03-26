@@ -8,6 +8,7 @@ namespace Chordy.BusinessLogic
         public static IServiceCollection AddBusinessLogic(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddScoped<IAuthorService, AuthorService>();
+            serviceCollection.AddScoped<ICollectionService, CollectionService>();
             return serviceCollection;
         }
     }

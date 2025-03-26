@@ -1,8 +1,6 @@
 ﻿using Chordy.BusinessLogic.Interfaces;
 using Chordy.BusinessLogic.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Threading;
 
 namespace Chordy.WebApi.Controllers
 {

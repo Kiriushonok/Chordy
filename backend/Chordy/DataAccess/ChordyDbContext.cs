@@ -14,8 +14,9 @@ namespace Chordy.DataAccess
             modelBuilder.Entity<Author>().Property(x => x.name).IsRequired();
 
             modelBuilder.Entity<Collection>().HasKey(x => x.Id);
+            modelBuilder.Entity<Collection>().Property(x => x.Id).HasColumnName("id");
             modelBuilder.Entity<Collection>().Property(x => x.Name).HasMaxLength(30);
-            modelBuilder.Entity<Collection>().Property(x => x.Name).IsRequired();
+            modelBuilder.Entity<Collection>().Property(x => x.Name).IsRequired().HasColumnName("name");
 
             base.OnModelCreating(modelBuilder);
         }
