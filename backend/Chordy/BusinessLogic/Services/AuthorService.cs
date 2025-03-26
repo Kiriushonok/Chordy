@@ -35,6 +35,11 @@ namespace Chordy.BusinessLogic.Services
             await authorRepository.DeleteAsync(author, cancellationToken);
         }
 
+        public async Task<List<Author>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            return await authorRepository.GetAllAsync(cancellationToken);
+        }
+
         public async Task<string> GetAuthorNameByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var author = await authorRepository.GetByIdAsync(id, cancellationToken);

@@ -9,5 +9,6 @@ namespace Chordy.DataAccess.Repositories.Interfaces
         Task UpdateAsync(Author author, CancellationToken cancellationToken = default);
         Task DeleteAsync(Author author, CancellationToken cancellationToken = default);
         Task<Author?> GetByNameAsync(string name, CancellationToken cancellationToken);
+        Task<List<Author>> GetAllAsync(CancellationToken cancellationToken);
     }
 }

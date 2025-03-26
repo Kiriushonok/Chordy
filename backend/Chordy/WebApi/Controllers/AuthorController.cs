@@ -7,14 +7,14 @@ using System.Threading;
 namespace Chordy.WebApi.Controllers
 {
     [ApiController]
-    [Route("Author")]
-    public class AuthorController(IAuthorService authorService, ILogger<AuthorController> logger) : ControllerBase
+    [Route("api/author")]
+    public class AuthorController(IAuthorService authorService) : ControllerBase
     {
         [HttpPost]
         public async Task<IActionResult> CreateAuthorAsync([FromBody] AuthorDto authorDto, CancellationToken cancellationToken)
         {
             var author = await authorService.CreateAsync(authorDto.Name, cancellationToken);
-            return Created($"/Author/{author.id}", author.name);
+            return CreatedAtAction("GetById", new { id = author.id }, author.name);
         }
 
         [HttpGet("by-id/{id:int}")]
@@ -29,6 +29,13 @@ namespace Chordy.WebApi.Controllers
         {
             var authorName = await authorService.GetByNameAsync(name, cancellationToken);
             return Ok(authorName);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
+        {
+            var authors = await authorService.GetAllAsync(cancellationToken);
+            return Ok(authors);
         }
 
         [HttpPut("{id:int}")]

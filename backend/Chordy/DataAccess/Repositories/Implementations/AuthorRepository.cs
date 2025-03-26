@@ -19,6 +19,11 @@ namespace Chordy.DataAccess.Repositories.Implementations
 
         }
 
+        public async Task<List<Author>> GetAllAsync(CancellationToken cancellationToken)
+        {
+            return await context.authors.ToListAsync(cancellationToken);
+        }
+
         public async Task<Author?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             return await context.authors.FirstOrDefaultAsync(x => x.id == id, cancellationToken);
@@ -34,5 +39,7 @@ namespace Chordy.DataAccess.Repositories.Implementations
             context.authors.Update(author);
             await context.SaveChangesAsync(cancellationToken);
         }
+
+
     }
 }

@@ -9,5 +9,6 @@ namespace Chordy.BusinessLogic.Interfaces
         Task<Author> GetByNameAsync(string name, CancellationToken cancellationToken = default);
         Task UpdateAsync(int id, string name, CancellationToken cancellationToken = default);
         Task DeleteAsync(int id, CancellationToken cancellationToken = default);
+        Task<List<Author>> GetAllAsync(CancellationToken cancellationToken = default);
     }
 }
