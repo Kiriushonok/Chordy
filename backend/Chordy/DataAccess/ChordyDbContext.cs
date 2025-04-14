@@ -9,14 +9,15 @@ namespace Chordy.DataAccess
         public DbSet<Collection> collections { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Author>().HasKey(x => x.id);
-            modelBuilder.Entity<Author>().Property(x => x.name).HasMaxLength(30);
-            modelBuilder.Entity<Author>().Property(x => x.name).IsRequired();
+            modelBuilder.Entity<Author>().HasKey(x => x.Id);
+            modelBuilder.Entity<Author>().Property(x => x.Name).HasMaxLength(30);
+            modelBuilder.Entity<Author>().Property(x => x.Name).IsRequired();
+            modelBuilder.Entity<Author>().HasIndex(x => x.Name).IsUnique();
 
             modelBuilder.Entity<Collection>().HasKey(x => x.Id);
-            modelBuilder.Entity<Collection>().Property(x => x.Id).HasColumnName("id");
             modelBuilder.Entity<Collection>().Property(x => x.Name).HasMaxLength(30);
-            modelBuilder.Entity<Collection>().Property(x => x.Name).IsRequired().HasColumnName("name");
+            modelBuilder.Entity<Collection>().Property(x => x.Name).IsRequired();
+            modelBuilder.Entity<Collection>().HasIndex(x => x.Name).IsUnique();
 
             base.OnModelCreating(modelBuilder);
         }

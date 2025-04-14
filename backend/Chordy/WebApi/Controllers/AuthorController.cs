@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace Chordy.WebApi.Controllers
 {
     [ApiController]
-    [Route("api/author")]
+    [Route("api/authors")]
     public class AuthorController(IAuthorService authorService) : ControllerBase
     {
         [HttpPost]
         public async Task<IActionResult> CreateAuthorAsync([FromBody] AuthorDto authorDto, CancellationToken cancellationToken)
         {
             var author = await authorService.CreateAsync(authorDto.Name, cancellationToken);
-            return CreatedAtAction("GetById", new { id = author.id }, author.name);
+            return CreatedAtAction("GetById", new { id = author.Id }, author.Name);
         }
 
         [HttpGet("by-id/{id:int}")]

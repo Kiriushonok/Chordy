@@ -6,6 +6,6 @@ namespace Chordy.BusinessLogic.Models
     {
             [Required(ErrorMessage = "Название подборки обязательно.")]
             [MaxLength(30, ErrorMessage = "Название подборки не должно превышать 30 символов.")]
-            public string Name { get; set; } = string.Empty; // Защита от null
+            public required string Name { get; set; }
     }
 }

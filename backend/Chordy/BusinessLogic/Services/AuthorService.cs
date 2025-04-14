@@ -17,7 +17,7 @@ namespace Chordy.BusinessLogic.Services
 
             var author = new Author
             {
-                name = name,
+                Name = name,
             };
             await authorRepository.CreateAsync(author, cancellationToken);
             return author;
@@ -49,7 +49,7 @@ namespace Chordy.BusinessLogic.Services
                 throw new KeyNotFoundException($"Автор с ID {id} не найден");
             }
 
-            return author.name;
+            return author.Name;
         }
 
         public async Task<Author> GetByNameAsync(string name, CancellationToken cancellationToken = default)
@@ -71,7 +71,7 @@ namespace Chordy.BusinessLogic.Services
                 throw new KeyNotFoundException($"Автор с ID {id} не найден");
             }
 
-            author.name = newName;
+            author.Name = newName;
             await authorRepository.UpdateAsync(author, cancellationToken);
         }
     }

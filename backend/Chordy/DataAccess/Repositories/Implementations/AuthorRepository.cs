@@ -26,12 +26,12 @@ namespace Chordy.DataAccess.Repositories.Implementations
 
         public async Task<Author?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            return await context.authors.FirstOrDefaultAsync(x => x.id == id, cancellationToken);
+            return await context.authors.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
         public async Task<Author?> GetByNameAsync(string name, CancellationToken cancellationToken)
         {
-            return await context.authors.FirstOrDefaultAsync(a => a.name == name, cancellationToken);
+            return await context.authors.FirstOrDefaultAsync(a => a.Name == name, cancellationToken);
         }
 
         public async Task UpdateAsync(Author author, CancellationToken cancellationToken = default)

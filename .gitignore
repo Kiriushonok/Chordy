@@ -403,3 +403,5 @@ FodyWeavers.xsd
 appsettings.json
 appsettings.*.json
 launchSettings.json
+
+Migrations/
