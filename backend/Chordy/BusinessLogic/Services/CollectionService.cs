@@ -9,6 +9,8 @@ namespace Chordy.BusinessLogic.Services
     {
         public async Task<Collection> CreateAsync(string name, CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Имя подборки не может быть пустым или состоять только из пробелов.", nameof(name));
             var existingCollection = await collectionRepository.GetByNameAsync(name, cancellationToken);
             if (existingCollection != null) {
                 throw new DuplicationConflictException($"Подборка с названием {name} уже существует");
@@ -50,6 +52,8 @@ namespace Chordy.BusinessLogic.Services
             if (collection == null) {
                 throw new KeyNotFoundException($"Подборка с ID {id} не найдена");
             }
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Имя подборки не может быть пустым или состоять только из пробелов.", nameof(name));
             collection.Name = name;
             await collectionRepository.UpdateAsync(collection);
         }

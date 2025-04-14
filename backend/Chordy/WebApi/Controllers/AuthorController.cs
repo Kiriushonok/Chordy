@@ -37,9 +37,9 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateAuthorAsync([FromRoute] int id, [FromBody] string newText, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateAuthorAsync([FromRoute] int id, [FromBody] AuthorDto authorDto, CancellationToken cancellationToken)
         {
-                await authorService.UpdateAsync(id, newText, cancellationToken);
+                await authorService.UpdateAsync(id, authorDto.Name, cancellationToken);
                 return NoContent();
         }
 

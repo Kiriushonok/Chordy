@@ -13,11 +13,22 @@ namespace Chordy.DataAccess
             modelBuilder.Entity<Author>().Property(x => x.Name).HasMaxLength(30);
             modelBuilder.Entity<Author>().Property(x => x.Name).IsRequired();
             modelBuilder.Entity<Author>().HasIndex(x => x.Name).IsUnique();
+            modelBuilder.Entity<Author>()
+                .ToTable(tb =>
+                {
+                    tb.HasCheckConstraint("CK_Author_Name_NotEmpty", "length(trim(\"Name\")) > 0");
+                });
+
 
             modelBuilder.Entity<Collection>().HasKey(x => x.Id);
             modelBuilder.Entity<Collection>().Property(x => x.Name).HasMaxLength(30);
             modelBuilder.Entity<Collection>().Property(x => x.Name).IsRequired();
             modelBuilder.Entity<Collection>().HasIndex(x => x.Name).IsUnique();
+            modelBuilder.Entity<Collection>()
+                .ToTable(tb =>
+                {
+                    tb.HasCheckConstraint("CK_Collection_Name_NotEmpty", "length(trim(\"Name\")) > 0");
+                });
 
             base.OnModelCreating(modelBuilder);
         }

@@ -2,6 +2,7 @@
 using Chordy.BusinessLogic.Interfaces;
 using Chordy.DataAccess.Entities;
 using Chordy.DataAccess.Repositories.Interfaces;
+using System.Xml.Linq;
 
 namespace Chordy.BusinessLogic.Services
 {
@@ -9,6 +10,8 @@ namespace Chordy.BusinessLogic.Services
     {
         public async Task<Author> CreateAsync(string name, CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Имя автора не может быть пустым или состоять только из пробелов.");
             var existingAuthor = await authorRepository.GetByNameAsync(name, cancellationToken);
             if (existingAuthor != null)
             {
@@ -70,6 +73,8 @@ namespace Chordy.BusinessLogic.Services
             {
                 throw new KeyNotFoundException($"Автор с ID {id} не найден");
             }
+            if (string.IsNullOrWhiteSpace(newName))
+                throw new ArgumentException("Имя автора не может быть пустым или состоять только из пробелов.");
 
             author.Name = newName;
             await authorRepository.UpdateAsync(author, cancellationToken);
