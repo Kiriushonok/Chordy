@@ -11,13 +11,15 @@ namespace Chordy.BusinessLogic.Mappers
             {
                 Id = author.Id,
                 Name = author.Name,
+                AvatarPath = author.AvatarPath,
             };
         }
 
-        public static Author ToEntity(AuthorCreateDto authorDto) {
+        public static Author ToEntity(AuthorCreateDto authorCreateDto) {
             return new Author
             {
-                Name = authorDto.Name
+                Name = authorCreateDto.Name,
+                AvatarPath = authorCreateDto.AvatarPath
             };
         }
     }

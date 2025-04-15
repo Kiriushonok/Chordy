@@ -17,7 +17,7 @@ namespace Chordy.BusinessLogic.Services
             {
                 throw new DuplicationConflictException($"Автор с именем '{authorCreateDto.Name}' уже существует.");
             }
-
+            authorCreateDto.AvatarPath = await FileHelper.SaveAvatarAsync(authorCreateDto.Avatar, authorCreateDto.Name, cancellationToken: cancellationToken);
             Author author = AuthorMapper.ToEntity(authorCreateDto);
             await authorRepository.CreateAsync(author, cancellationToken);
 
@@ -31,6 +31,11 @@ namespace Chordy.BusinessLogic.Services
             if (author == null)
             {
                 throw new KeyNotFoundException($"Автор с ID {id} не найден");
+            }
+
+            if (!string.IsNullOrEmpty(author.AvatarPath))
+            {
+                FileHelper.DeleteAvatar(author.AvatarPath);
             }
 
             await authorRepository.DeleteAsync(author, cancellationToken);
@@ -64,17 +69,29 @@ namespace Chordy.BusinessLogic.Services
             return AuthorMapper.ToDto(author);
         }
 
-        public async Task UpdateAsync(int id, AuthorCreateDto authorDto, CancellationToken cancellationToken = default)
+        public async Task UpdateAsync(int id, AuthorCreateDto authorCreateDto, CancellationToken cancellationToken = default)
         {
-            AuthorValidator.Validate(authorDto);
+            AuthorValidator.Validate(authorCreateDto);
             var author = await authorRepository.GetByIdAsync(id, cancellationToken);
 
             if (author == null)
             {
                 throw new KeyNotFoundException($"Автор с ID {id} не найден");
             }
+            var existingAuthor = await authorRepository.GetByNameAsync(authorCreateDto.Name, cancellationToken);
+            if (existingAuthor != null && existingAuthor.Id != id)
+            {
+                throw new DuplicationConflictException($"Автор с именем '{authorCreateDto.Name}' уже существует.");
+            }
 
-            author.Name = authorDto.Name;
+            if (!string.IsNullOrEmpty(author.AvatarPath)) 
+            {
+                FileHelper.DeleteAvatar(author.AvatarPath);
+            }
+
+            authorCreateDto.AvatarPath = await FileHelper.SaveAvatarAsync(authorCreateDto.Avatar, authorCreateDto.Name, cancellationToken: cancellationToken);
+            author.Name = authorCreateDto.Name;
+            author.AvatarPath = authorCreateDto.AvatarPath;
             await authorRepository.UpdateAsync(author, cancellationToken);
         }
     }

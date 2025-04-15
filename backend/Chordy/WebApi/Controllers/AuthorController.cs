@@ -1,4 +1,5 @@
-﻿using Chordy.BusinessLogic.Interfaces;
+﻿using Chordy.BusinessLogic;
+using Chordy.BusinessLogic.Interfaces;
 using Chordy.BusinessLogic.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,17 +10,17 @@ namespace Chordy.WebApi.Controllers
     public class AuthorController(IAuthorService authorService) : ControllerBase
     {
         [HttpPost]
-        public async Task<IActionResult> CreateAuthorAsync([FromBody] AuthorCreateDto authorDto, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateAuthorAsync([FromForm] AuthorCreateDto authorCreateDto, CancellationToken cancellationToken)
         {
-            var author = await authorService.CreateAsync(authorDto, cancellationToken);
+            var author = await authorService.CreateAsync(authorCreateDto, cancellationToken);
             return CreatedAtAction("GetById", new { id = author.Id }, author);
         }
 
         [HttpGet("by-id/{id:int}")]
         public async Task<IActionResult> GetByIdAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
-                var authorName = await authorService.GetAuthorByIdAsync(id, cancellationToken);
-                return Ok(authorName);
+            var authorName = await authorService.GetAuthorByIdAsync(id, cancellationToken);
+            return Ok(authorName);
         }
 
         [HttpGet("by-name/{name}")]
@@ -37,17 +38,17 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateAuthorAsync([FromRoute] int id, [FromBody] AuthorCreateDto authorDto, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateAuthorAsync([FromRoute] int id, [FromForm] AuthorCreateDto authorCreateDto, CancellationToken cancellationToken)
         {
-                await authorService.UpdateAsync(id, authorDto, cancellationToken);
-                return NoContent();
+            await authorService.UpdateAsync(id, authorCreateDto, cancellationToken);
+            return NoContent();
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAuthorAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
-                await authorService.DeleteAsync(id, cancellationToken);
-                return NoContent();
+            await authorService.DeleteAsync(id, cancellationToken);
+            return NoContent();
         }
     }
 }

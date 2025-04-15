@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Folder Include="DataAccess\Migrations\" />
+    <Folder Include="wwwroot\avatars\" />
   </ItemGroup>
 
 </Project>
