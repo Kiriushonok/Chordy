@@ -4,14 +4,14 @@ using Chordy.BusinessLogic.Mappers;
 using Chordy.BusinessLogic.Models;
 using Chordy.DataAccess.Entities;
 using Chordy.DataAccess.Repositories.Interfaces;
+using Chordy.BusinessLogic.Validators;
 namespace Chordy.BusinessLogic.Services
 {
     internal class AuthorService(IAuthorRepository authorRepository) : IAuthorService
     {
         public async Task<AuthorDto> CreateAsync(AuthorCreateDto authorCreateDto, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(authorCreateDto.Name))
-                throw new ArgumentException("Имя автора не может быть пустым или состоять только из пробелов.");
+            AuthorValidator.Validate(authorCreateDto);
             var existingAuthor = await authorRepository.GetByNameAsync(authorCreateDto.Name, cancellationToken);
             if (existingAuthor != null)
             {
@@ -66,8 +66,7 @@ namespace Chordy.BusinessLogic.Services
 
         public async Task UpdateAsync(int id, AuthorCreateDto authorDto, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(authorDto.Name))
-                throw new ArgumentException("Имя автора не может быть пустым или состоять только из пробелов.");
+            AuthorValidator.Validate(authorDto);
             var author = await authorRepository.GetByIdAsync(id, cancellationToken);
 
             if (author == null)

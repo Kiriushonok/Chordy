@@ -4,14 +4,14 @@ using Chordy.BusinessLogic.Mappers;
 using Chordy.BusinessLogic.Models;
 using Chordy.DataAccess.Entities;
 using Chordy.DataAccess.Repositories.Interfaces;
+using Chordy.BusinessLogic.Validators;
 namespace Chordy.BusinessLogic.Services
 {
     public class CollectionService(ICollectionRepository collectionRepository) : ICollectionService
     {
         public async Task<CollectionDto> CreateAsync(CollectionCreateDto collectionCreateDto, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(collectionCreateDto.Name))
-                throw new ArgumentException("Имя подборки не может быть пустым или состоять только из пробелов.");
+            CollectionValidator.Validate(collectionCreateDto);
             var existingCollection = await collectionRepository.GetByNameAsync(collectionCreateDto.Name, cancellationToken);
             if (existingCollection != null) 
             {
@@ -48,8 +48,7 @@ namespace Chordy.BusinessLogic.Services
 
         public async Task UpdateAsync(int id, CollectionCreateDto collectionCreateDto, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(collectionCreateDto.Name))
-                throw new ArgumentException("Имя подборки не может быть пустым или состоять только из пробелов.");
+            CollectionValidator.Validate(collectionCreateDto);
             var collection = await collectionRepository.GetByIdAsync(id, cancellationToken);
             if (collection == null) {
                 throw new KeyNotFoundException($"Подборка с ID {id} не найдена");
