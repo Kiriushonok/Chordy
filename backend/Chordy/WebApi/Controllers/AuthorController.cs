@@ -9,16 +9,16 @@ namespace Chordy.WebApi.Controllers
     public class AuthorController(IAuthorService authorService) : ControllerBase
     {
         [HttpPost]
-        public async Task<IActionResult> CreateAuthorAsync([FromBody] AuthorDto authorDto, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateAuthorAsync([FromBody] AuthorCreateDto authorDto, CancellationToken cancellationToken)
         {
-            var author = await authorService.CreateAsync(authorDto.Name, cancellationToken);
-            return CreatedAtAction("GetById", new { id = author.Id }, author.Name);
+            var author = await authorService.CreateAsync(authorDto, cancellationToken);
+            return CreatedAtAction("GetById", new { id = author.Id }, author);
         }
 
         [HttpGet("by-id/{id:int}")]
         public async Task<IActionResult> GetByIdAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
-                var authorName = await authorService.GetAuthorNameByIdAsync(id, cancellationToken);
+                var authorName = await authorService.GetAuthorByIdAsync(id, cancellationToken);
                 return Ok(authorName);
         }
 
@@ -37,9 +37,9 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateAuthorAsync([FromRoute] int id, [FromBody] AuthorDto authorDto, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateAuthorAsync([FromRoute] int id, [FromBody] AuthorCreateDto authorDto, CancellationToken cancellationToken)
         {
-                await authorService.UpdateAsync(id, authorDto.Name, cancellationToken);
+                await authorService.UpdateAsync(id, authorDto, cancellationToken);
                 return NoContent();
         }
 

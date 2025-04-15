@@ -1,29 +1,25 @@
 ﻿using Chordy.BusinessLogic.Exceptions;
 using Chordy.BusinessLogic.Interfaces;
+using Chordy.BusinessLogic.Mappers;
+using Chordy.BusinessLogic.Models;
 using Chordy.DataAccess.Entities;
 using Chordy.DataAccess.Repositories.Interfaces;
-using System.Xml.Linq;
-
 namespace Chordy.BusinessLogic.Services
 {
     internal class AuthorService(IAuthorRepository authorRepository) : IAuthorService
     {
-        public async Task<Author> CreateAsync(string name, CancellationToken cancellationToken = default)
+        public async Task<AuthorDto> CreateAsync(AuthorCreateDto authorDto, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Имя автора не может быть пустым или состоять только из пробелов.");
-            var existingAuthor = await authorRepository.GetByNameAsync(name, cancellationToken);
+            var existingAuthor = await authorRepository.GetByNameAsync(authorDto.Name, cancellationToken);
             if (existingAuthor != null)
             {
-                throw new DuplicationConflictException($"Автор с именем '{name}' уже существует.");
+                throw new DuplicationConflictException($"Автор с именем '{authorDto.Name}' уже существует.");
             }
 
-            var author = new Author
-            {
-                Name = name,
-            };
+            Author author = AuthorMapper.ToEntity(authorDto);
             await authorRepository.CreateAsync(author, cancellationToken);
-            return author;
+
+            return AuthorMapper.ToDto(author);
         }
 
         public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
@@ -38,12 +34,13 @@ namespace Chordy.BusinessLogic.Services
             await authorRepository.DeleteAsync(author, cancellationToken);
         }
 
-        public async Task<List<Author>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<List<AuthorDto>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await authorRepository.GetAllAsync(cancellationToken);
+            var authors = await authorRepository.GetAllAsync(cancellationToken);
+            return authors.Select(AuthorMapper.ToDto).ToList();
         }
 
-        public async Task<string> GetAuthorNameByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<AuthorDto> GetAuthorByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var author = await authorRepository.GetByIdAsync(id, cancellationToken);
 
@@ -52,20 +49,20 @@ namespace Chordy.BusinessLogic.Services
                 throw new KeyNotFoundException($"Автор с ID {id} не найден");
             }
 
-            return author.Name;
+            return AuthorMapper.ToDto(author);
         }
 
-        public async Task<Author> GetByNameAsync(string name, CancellationToken cancellationToken = default)
+        public async Task<AuthorDto> GetByNameAsync(string name, CancellationToken cancellationToken = default)
         {
             var author = await authorRepository.GetByNameAsync(name, cancellationToken);
             if (author == null)
             {
                 throw new KeyNotFoundException($"Автор {name} не найден");
             }
-            return author;
+            return AuthorMapper.ToDto(author);
         }
 
-        public async Task UpdateAsync(int id, string newName, CancellationToken cancellationToken = default)
+        public async Task UpdateAsync(int id, AuthorCreateDto authorDto, CancellationToken cancellationToken = default)
         {
             var author = await authorRepository.GetByIdAsync(id, cancellationToken);
 
@@ -73,10 +70,8 @@ namespace Chordy.BusinessLogic.Services
             {
                 throw new KeyNotFoundException($"Автор с ID {id} не найден");
             }
-            if (string.IsNullOrWhiteSpace(newName))
-                throw new ArgumentException("Имя автора не может быть пустым или состоять только из пробелов.");
 
-            author.Name = newName;
+            author.Name = authorDto.Name;
             await authorRepository.UpdateAsync(author, cancellationToken);
         }
     }
