@@ -35,7 +35,7 @@ public class GlobalExceptionMiddleware
         }
     }
 
-    private (int StatusCode, string Title, string Detail) HandleDbUpdateException(DbUpdateException dbEx)
+    private (int StatusCode, string Title, string Detail, string Type) HandleDbUpdateException(DbUpdateException dbEx)
     {
         var postgresEx = dbEx.InnerException as PostgresException;
         var message = postgresEx?.Message ?? dbEx.InnerException?.Message ?? dbEx.Message;
@@ -47,12 +47,12 @@ public class GlobalExceptionMiddleware
 
             if (postgresEx.SqlState == PostgresErrorCodes.UniqueViolation)
             {
-                return ((int)HttpStatusCode.Conflict, "Нарушение уникальности", "Запись с такими данными уже существует.");
+                return ((int)HttpStatusCode.Conflict, "Нарушение уникальности", "Запись с такими данными уже существует.", "unique-violation");
             }
 
             if (postgresEx.SqlState == PostgresErrorCodes.StringDataRightTruncation)
             {
-                return ((int)HttpStatusCode.BadRequest, "Превышена длина поля", "Одно из полей превышает допустимую длину.");
+                return ((int)HttpStatusCode.BadRequest, "Превышена длина поля", "Одно из полей превышает допустимую длину.", "string-truncation");
             }
 
             if (postgresEx.SqlState == PostgresErrorCodes.CheckViolation)
@@ -61,38 +61,45 @@ public class GlobalExceptionMiddleware
 
                 if (CheckConstraintMessages.TryGetValue(constraintName, out var msg))
                 {
-                    return ((int)HttpStatusCode.BadRequest, msg.Title, msg.Detail);
+                    return ((int)HttpStatusCode.BadRequest, msg.Title, msg.Detail, "check-violation");
                 }
 
                 // Неизвестное ограничение — логируем явно
                 _logger.LogWarning("Необработанное ограничение CHECK: {Constraint}", constraintName);
 
                 return ((int)HttpStatusCode.BadRequest, "Ошибка проверки данных",
-                    "Одно из введённых значений не прошло проверку. Убедитесь, что поля заполнены корректно.");
+                    "Одно из введённых значений не прошло проверку. Убедитесь, что поля заполнены корректно.", "check-violation");
             }
         }
 
         _logger.LogError(dbEx, "Ошибка базы данных: {Message}", message);
-        return ((int)HttpStatusCode.InternalServerError, "Ошибка базы данных", "Ошибка при сохранении данных. Проверьте корректность входных данных.");
+        return ((int)HttpStatusCode.InternalServerError, "Ошибка базы данных", "Ошибка при сохранении данных. Проверьте корректность входных данных.", "db-error");
+    }
+
+    private (int StatusCode, string Title, string Detail, string Type) MapExceptionToProblem(Exception exception)
+    {
+        return exception switch
+        {
+            KeyNotFoundException => ((int)HttpStatusCode.NotFound, "Ресурс не найден", exception.Message, "not-found"),
+            ArgumentException => ((int)HttpStatusCode.BadRequest, "Ошибка в запросе", exception.Message, "bad-request"),
+            DuplicationConflictException => ((int)HttpStatusCode.Conflict, "Конфликт дублирования данных", exception.Message, "conflict"),
+            DbUpdateException dbEx => HandleDbUpdateException(dbEx),
+            // Здесь можно легко добавить новые типы ошибок:
+            // CustomException ex => (...)
+            _ => ((int)HttpStatusCode.InternalServerError, "Ошибка сервера", "Произошла внутренняя ошибка. Подробнее см. журнал.", "server-error")
+        };
     }
 
     private Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        var (statusCode, title, detail) = exception switch
-        {
-            KeyNotFoundException => ((int)HttpStatusCode.NotFound, "Ресурс не найден", exception.Message),
-            ArgumentException => ((int)HttpStatusCode.BadRequest, "Ошибка в запросе", exception.Message),
-            DuplicationConflictException => ((int)HttpStatusCode.Conflict, "Конфликт дублирования данных", exception.Message),
-            DbUpdateException dbEx => HandleDbUpdateException(dbEx),
-            _ => ((int)HttpStatusCode.InternalServerError, "Ошибка сервера", "Произошла внутренняя ошибка. Подробнее см. журнал.")
-        };
+        var (statusCode, title, detail, type) = MapExceptionToProblem(exception);
 
         var problemDetails = new ProblemDetails
         {
             Status = statusCode,
             Title = title,
             Detail = detail,
-            Type = $"https://api.chordy.com/errors/{statusCode}"
+            Type = $"https://api.chordy.com/errors/{type}"
         };
 
         var response = JsonSerializer.Serialize(problemDetails);
