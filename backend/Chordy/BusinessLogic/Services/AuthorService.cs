@@ -8,15 +8,17 @@ namespace Chordy.BusinessLogic.Services
 {
     internal class AuthorService(IAuthorRepository authorRepository) : IAuthorService
     {
-        public async Task<AuthorDto> CreateAsync(AuthorCreateDto authorDto, CancellationToken cancellationToken = default)
+        public async Task<AuthorDto> CreateAsync(AuthorCreateDto authorCreateDto, CancellationToken cancellationToken = default)
         {
-            var existingAuthor = await authorRepository.GetByNameAsync(authorDto.Name, cancellationToken);
+            if (string.IsNullOrWhiteSpace(authorCreateDto.Name))
+                throw new ArgumentException("Имя автора не может быть пустым или состоять только из пробелов.");
+            var existingAuthor = await authorRepository.GetByNameAsync(authorCreateDto.Name, cancellationToken);
             if (existingAuthor != null)
             {
-                throw new DuplicationConflictException($"Автор с именем '{authorDto.Name}' уже существует.");
+                throw new DuplicationConflictException($"Автор с именем '{authorCreateDto.Name}' уже существует.");
             }
 
-            Author author = AuthorMapper.ToEntity(authorDto);
+            Author author = AuthorMapper.ToEntity(authorCreateDto);
             await authorRepository.CreateAsync(author, cancellationToken);
 
             return AuthorMapper.ToDto(author);
@@ -64,6 +66,8 @@ namespace Chordy.BusinessLogic.Services
 
         public async Task UpdateAsync(int id, AuthorCreateDto authorDto, CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrWhiteSpace(authorDto.Name))
+                throw new ArgumentException("Имя автора не может быть пустым или состоять только из пробелов.");
             var author = await authorRepository.GetByIdAsync(id, cancellationToken);
 
             if (author == null)

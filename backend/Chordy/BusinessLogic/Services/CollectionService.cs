@@ -1,26 +1,25 @@
 ﻿using Chordy.BusinessLogic.Exceptions;
 using Chordy.BusinessLogic.Interfaces;
+using Chordy.BusinessLogic.Mappers;
+using Chordy.BusinessLogic.Models;
 using Chordy.DataAccess.Entities;
 using Chordy.DataAccess.Repositories.Interfaces;
-
 namespace Chordy.BusinessLogic.Services
 {
     public class CollectionService(ICollectionRepository collectionRepository) : ICollectionService
     {
-        public async Task<Collection> CreateAsync(string name, CancellationToken cancellationToken = default)
+        public async Task<CollectionDto> CreateAsync(CollectionCreateDto collectionCreateDto, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Имя подборки не может быть пустым или состоять только из пробелов.", nameof(name));
-            var existingCollection = await collectionRepository.GetByNameAsync(name, cancellationToken);
-            if (existingCollection != null) {
-                throw new DuplicationConflictException($"Подборка с названием {name} уже существует");
-            }
-            var collection = new Collection
+            if (string.IsNullOrWhiteSpace(collectionCreateDto.Name))
+                throw new ArgumentException("Имя подборки не может быть пустым или состоять только из пробелов.");
+            var existingCollection = await collectionRepository.GetByNameAsync(collectionCreateDto.Name, cancellationToken);
+            if (existingCollection != null) 
             {
-                Name = name,
-            };
+                throw new DuplicationConflictException($"Подборка с названием {collectionCreateDto.Name} уже существует");
+            }
+            var collection = CollectionMapper.ToEntity(collectionCreateDto);
             await collectionRepository.CreateAsync(collection, cancellationToken);
-            return collection;
+            return CollectionMapper.ToDto(collection);
         }
 
         public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
@@ -32,29 +31,30 @@ namespace Chordy.BusinessLogic.Services
             await collectionRepository.DeleteAsync(collection, cancellationToken);
         }
 
-        public async Task<List<Collection>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<List<CollectionDto>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await collectionRepository.GetAllAsync(cancellationToken);
+            var collections = await collectionRepository.GetAllAsync(cancellationToken);
+            return collections.Select(CollectionMapper.ToDto).ToList();
         }
 
-        public async Task<Collection> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<CollectionDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var collection = await collectionRepository.GetByIdAsync(id, cancellationToken);
             if (collection == null) {
                 throw new KeyNotFoundException($"Подборка с ID {id} не найдена");
             }
-            return collection;
+            return CollectionMapper.ToDto(collection);
         }
 
-        public async Task UpdateAsync(int id, string name, CancellationToken cancellationToken = default)
+        public async Task UpdateAsync(int id, CollectionCreateDto collectionCreateDto, CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrWhiteSpace(collectionCreateDto.Name))
+                throw new ArgumentException("Имя подборки не может быть пустым или состоять только из пробелов.");
             var collection = await collectionRepository.GetByIdAsync(id, cancellationToken);
             if (collection == null) {
                 throw new KeyNotFoundException($"Подборка с ID {id} не найдена");
             }
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Имя подборки не может быть пустым или состоять только из пробелов.", nameof(name));
-            collection.Name = name;
+            collection.Name = collectionCreateDto.Name;
             await collectionRepository.UpdateAsync(collection);
         }
     }

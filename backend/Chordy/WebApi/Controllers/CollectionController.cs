@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace Chordy.WebApi.Controllers
 {
     [ApiController]
-    [Route("api/collection")]
+    [Route("api/collections")]
     public class CollectionController(ICollectionService collectionService) : ControllerBase
     {
         [HttpPost]
-        public async Task<IActionResult> CreateCollectionAsync([FromBody] CollectionDto collectionDto, CancellationToken cancellationToken) 
+        public async Task<IActionResult> CreateCollectionAsync([FromBody] CollectionCreateDto collectionDto, CancellationToken cancellationToken) 
         {
-            var collection = await collectionService.CreateAsync(collectionDto.Name, cancellationToken);
+            var collection = await collectionService.CreateAsync(collectionDto, cancellationToken);
             return CreatedAtAction("GetCollectionById", new {id = collection.Id}, collection);
         }
 
@@ -31,9 +31,9 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCollectionAsync([FromRoute] int id, [FromBody] CollectionDto collectionDto, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateCollectionAsync([FromRoute] int id, [FromBody] CollectionCreateDto collectionDto, CancellationToken cancellationToken)
         {
-            await collectionService.UpdateAsync(id, collectionDto.Name, cancellationToken);
+            await collectionService.UpdateAsync(id, collectionDto, cancellationToken);
             return NoContent();
         }
 
