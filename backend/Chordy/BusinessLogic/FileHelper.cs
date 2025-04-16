@@ -1,6 +1,4 @@
-﻿using Chordy.DataAccess.Entities;
-
-namespace Chordy.BusinessLogic
+﻿namespace Chordy.BusinessLogic
 {
     public static class FileHelper
     {
@@ -11,7 +9,7 @@ namespace Chordy.BusinessLogic
                 return null;
             }
             var safeName = string.Concat(authorName.Where(char.IsLetterOrDigit)).ToLower();
-            var fileName = $"{safeName}{Path.GetExtension(file.FileName)}";
+            var fileName = $"{safeName}_{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
             var filePath = Path.Combine(folder, fileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
