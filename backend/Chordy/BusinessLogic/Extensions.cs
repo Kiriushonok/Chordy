@@ -9,6 +9,8 @@ namespace Chordy.BusinessLogic
         {
             serviceCollection.AddScoped<IAuthorService, AuthorService>();
             serviceCollection.AddScoped<ICollectionService, CollectionService>();
+            serviceCollection.AddScoped<IUserService, UserService>();
+            serviceCollection.AddScoped<IJwtProvider, JwtProvider>();
             return serviceCollection;
         }
     }

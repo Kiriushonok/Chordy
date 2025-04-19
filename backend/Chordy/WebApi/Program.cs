@@ -1,5 +1,6 @@
 using Chordy.BusinessLogic;
 using Chordy.DataAccess;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDataAcess(builder.Configuration);
 builder.Services.AddBusinessLogic();
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
+builder.Services.AddApiAuthentication(builder.Configuration);
 
 var app = builder.Build();
 app.UseMiddleware<GlobalExceptionMiddleware>();
@@ -22,6 +25,16 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    MinimumSameSitePolicy = SameSiteMode.Strict,
+    HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
+    Secure = CookieSecurePolicy.Always,
+    
+});
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

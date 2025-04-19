@@ -1,6 +1,6 @@
 ﻿using Chordy.BusinessLogic.Interfaces;
 using Chordy.BusinessLogic.Models;
-using Chordy.BusinessLogic.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Chordy.WebApi.Controllers
@@ -10,6 +10,7 @@ namespace Chordy.WebApi.Controllers
     public class CollectionController(ICollectionService collectionService) : ControllerBase
     {
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateCollectionAsync([FromBody] CollectionCreateDto collectionDto, CancellationToken cancellationToken) 
         {
             var collection = await collectionService.CreateAsync(collectionDto, cancellationToken);
@@ -31,6 +32,7 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateCollectionAsync([FromRoute] int id, [FromBody] CollectionCreateDto collectionDto, CancellationToken cancellationToken)
         {
             await collectionService.UpdateAsync(id, collectionDto, cancellationToken);
@@ -38,6 +40,7 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize]
         public async Task<IActionResult> DeleteCollectionAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
             await collectionService.DeleteAsync(id, cancellationToken);

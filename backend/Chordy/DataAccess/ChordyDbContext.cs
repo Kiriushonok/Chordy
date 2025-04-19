@@ -7,6 +7,7 @@ namespace Chordy.DataAccess
     {
         public DbSet<Author> authors { get; set; }
         public DbSet<Collection> collections { get; set; }
+        public DbSet<User> users { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Author>().HasKey(x => x.Id);
@@ -29,6 +30,18 @@ namespace Chordy.DataAccess
                 {
                     tb.HasCheckConstraint("CK_Collection_Name_NotEmpty", "length(trim(\"Name\")) > 0");
                 });
+
+            modelBuilder.Entity<User>().HasKey(x => x.Id);
+            modelBuilder.Entity<User>().Property(x => x.Login).HasMaxLength(30);
+            modelBuilder.Entity<User>().Property(x => x.Login).IsRequired();
+            modelBuilder.Entity<User>().HasIndex(x => x.Login).IsUnique();
+            modelBuilder.Entity<User>().ToTable(tb =>
+            {
+                tb.HasCheckConstraint("CK_User_Login_NotEmpty", "length(trim(\"Login\")) > 0");
+            });
+            modelBuilder.Entity<User>().Property(x => x.PasswordHash).IsRequired();
+            modelBuilder.Entity<User>().Property(x => x.PasswordHash).HasMaxLength(128);
+
 
             base.OnModelCreating(modelBuilder);
         }

@@ -1,5 +1,4 @@
-﻿using Chordy.BusinessLogic;
-using Chordy.BusinessLogic.Interfaces;
+﻿using Chordy.BusinessLogic.Interfaces;
 using Chordy.BusinessLogic.Models;
 using Microsoft.AspNetCore.Mvc;
 

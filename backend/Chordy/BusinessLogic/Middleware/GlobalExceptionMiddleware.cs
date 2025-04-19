@@ -13,7 +13,8 @@ public class GlobalExceptionMiddleware
     private static readonly Dictionary<string, (string Title, string Detail)> CheckConstraintMessages = new()
     {
         ["CK_Author_Name_NotEmpty"] = ("Недопустимое значение поля", "Имя автора не может быть пустым."),
-        ["CK_Collection_Name_NotEmpty"] = ("Недопустимое значение поля", "Название подборки не может быть пустым.")
+        ["CK_Collection_Name_NotEmpty"] = ("Недопустимое значение поля", "Название подборки не может быть пустым."),
+        ["CK_User_Login_NotEmpty"] = ("Недопустимое значение поля", "Логин пользователя не может быть пустым.")
     };
 
     public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)

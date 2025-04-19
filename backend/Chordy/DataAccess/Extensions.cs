@@ -10,6 +10,7 @@ namespace Chordy.DataAccess
         {
             serviceCollection.AddScoped<IAuthorRepository, AuthorRepository>();
             serviceCollection.AddScoped<ICollectionRepository, CollectionRepository>();
+            serviceCollection.AddScoped<IUserRepository,  UserRepository>();
             serviceCollection.AddDbContext<ChordyDbContext>(x =>
             {
                 x.UseNpgsql(configuration.GetConnectionString("PostgreSQL"));
