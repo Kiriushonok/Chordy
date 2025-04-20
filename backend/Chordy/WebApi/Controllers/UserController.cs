@@ -1,6 +1,7 @@
 ﻿using Chordy.BusinessLogic.Interfaces;
 using Chordy.BusinessLogic.Models;
 using Chordy.BusinessLogic.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,13 +19,15 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpGet("{login}")]
+        [Authorize]
         public async Task<IActionResult> GetUserByLoginAsync([FromRoute] string login, CancellationToken cancellationToken)
         {
-            var user = await userService.GetUserByLoginAsync(login);
+            var user = await userService.GetUserByLoginAsync(login, cancellationToken);
             return Ok(user);
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllUsersAsync(CancellationToken cancellationToken) 
         { 
             var users = await userService.GetAllUsersAsync(cancellationToken);
@@ -32,6 +35,7 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpPut("{login}")]
+        [Authorize]
         public async Task<IActionResult> UpdateUserAsync([FromRoute] string login, [FromBody] UserRegisterDto userRegisterDto, CancellationToken cancellationToken)
         {
             await userService.UpdateAsync(login, userRegisterDto, cancellationToken);
@@ -39,6 +43,7 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpDelete("{login}")]
+        [Authorize]
         public async Task<IActionResult> DeleteUserAsync([FromRoute] string login, CancellationToken cancellationToken)
         {
             await userService.DeleteAsync(login, cancellationToken);
@@ -72,9 +77,6 @@ namespace Chordy.WebApi.Controllers
         public async Task<IActionResult> RefreshTokenAsync(CancellationToken cancellationToken)
         {
             var refreshToken = Request.Cookies["refresh_token"];
-            if (string.IsNullOrEmpty(refreshToken)) 
-                return NoContent();
-
             var (newAccessToken, newRefreshToken, isPersistent) = await userService.RefreshTokensAsync(refreshToken, cancellationToken);
             // Обновляем куки
             var accessCookieOptions = new CookieOptions

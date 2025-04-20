@@ -1,4 +1,4 @@
-﻿namespace Chordy.BusinessLogic
+﻿namespace Chordy.BusinessLogic.Jwt
 {
     public class JwtOptions
     {

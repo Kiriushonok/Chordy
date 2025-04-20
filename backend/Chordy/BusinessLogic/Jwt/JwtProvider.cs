@@ -6,7 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Chordy.BusinessLogic
+namespace Chordy.BusinessLogic.Jwt
 {
     public class JwtProvider(IOptions<JwtOptions> options) : IJwtProvider
     {

@@ -39,7 +39,5 @@ namespace Chordy.DataAccess.Repositories.Implementations
             context.authors.Update(author);
             await context.SaveChangesAsync(cancellationToken);
         }
-
-
     }
 }

@@ -1,9 +1,10 @@
 ﻿using Chordy.BusinessLogic.Interfaces;
+using Chordy.BusinessLogic.Jwt;
 using Chordy.BusinessLogic.Services;
 
-namespace Chordy.BusinessLogic
+namespace Chordy.BusinessLogic.Extensions
 {
-    public static class Extensions
+    public static class DIExtensions
     {
         public static IServiceCollection AddBusinessLogic(this IServiceCollection serviceCollection)
         {

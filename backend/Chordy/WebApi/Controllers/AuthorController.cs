@@ -1,5 +1,6 @@
 ﻿using Chordy.BusinessLogic.Interfaces;
 using Chordy.BusinessLogic.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Chordy.WebApi.Controllers
@@ -35,14 +36,14 @@ namespace Chordy.WebApi.Controllers
             var authors = await authorService.GetAllAsync(cancellationToken);
             return Ok(authors);
         }
-
+        [Authorize]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateAuthorAsync([FromRoute] int id, [FromForm] AuthorCreateDto authorCreateDto, CancellationToken cancellationToken)
         {
             await authorService.UpdateAsync(id, authorCreateDto, cancellationToken);
             return NoContent();
         }
-
+        [Authorize]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAuthorAsync([FromRoute] int id, CancellationToken cancellationToken)
         {

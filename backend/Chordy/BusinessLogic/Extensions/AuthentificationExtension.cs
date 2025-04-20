@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Chordy.BusinessLogic.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Chordy.BusinessLogic
+namespace Chordy.BusinessLogic.Extensions
 {
     public static class AuthentificationExtension
     {

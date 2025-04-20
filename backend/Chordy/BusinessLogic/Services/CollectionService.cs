@@ -54,7 +54,7 @@ namespace Chordy.BusinessLogic.Services
                 throw new KeyNotFoundException($"Подборка с ID {id} не найдена");
             }
             collection.Name = collectionCreateDto.Name;
-            await collectionRepository.UpdateAsync(collection);
+            await collectionRepository.UpdateAsync(collection, cancellationToken);
         }
     }
 }

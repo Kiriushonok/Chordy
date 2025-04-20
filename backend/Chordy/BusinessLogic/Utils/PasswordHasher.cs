@@ -1,6 +1,6 @@
 ﻿using BCrypt.Net;
 
-namespace Chordy.BusinessLogic
+namespace Chordy.BusinessLogic.Utils
 {
     public static class PasswordHasher
     {

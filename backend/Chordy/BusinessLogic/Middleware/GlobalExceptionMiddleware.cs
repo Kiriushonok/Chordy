@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System.Net;
+using System.Security;
 using System.Text.Json;
 
 public class GlobalExceptionMiddleware
@@ -85,6 +86,8 @@ public class GlobalExceptionMiddleware
             ArgumentException => ((int)HttpStatusCode.BadRequest, "Ошибка в запросе", exception.Message, "bad-request"),
             DuplicationConflictException => ((int)HttpStatusCode.Conflict, "Конфликт дублирования данных", exception.Message, "conflict"),
             DbUpdateException dbEx => HandleDbUpdateException(dbEx),
+            UnauthorizedAccessException => ((int)HttpStatusCode.Unauthorized, "Ошибка авторизации", exception.Message, "unauthorized"),
+            SecurityException => ((int)HttpStatusCode.Unauthorized, "Ошибка авторизации", exception.Message, "unauthorized"),
             // Здесь можно легко добавить новые типы ошибок:
             // CustomException ex => (...)
             _ => ((int)HttpStatusCode.InternalServerError, "Ошибка сервера", "Произошла внутренняя ошибка. Подробнее см. журнал.", "server-error")

@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace Chordy.BusinessLogic
+namespace Chordy.BusinessLogic.Utils
 {
     public static class TokenHelper
     {

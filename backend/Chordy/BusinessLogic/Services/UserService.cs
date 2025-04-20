@@ -2,6 +2,7 @@
 using Chordy.BusinessLogic.Interfaces;
 using Chordy.BusinessLogic.Mappers;
 using Chordy.BusinessLogic.Models;
+using Chordy.BusinessLogic.Utils;
 using Chordy.BusinessLogic.Validators;
 using Chordy.DataAccess.Entities;
 using Chordy.DataAccess.Repositories.Interfaces;
@@ -21,7 +22,7 @@ namespace Chordy.BusinessLogic.Services
             }
             User user = UserMapper.ToEntity(userRegister);
             user.Id = Guid.NewGuid();
-            await userRepository.CreateAsync(user);
+            await userRepository.CreateAsync(user, cancellationToken);
 
             return UserMapper.ToDto(user);
         }
@@ -30,7 +31,7 @@ namespace Chordy.BusinessLogic.Services
         {
             var user = await userRepository.GetByLoginAsync(login, cancellationToken)
                 ?? throw new KeyNotFoundException($"Пользователь с логином '{login} не найден'");
-            await userRepository.DeleteAsync(user);
+            await userRepository.DeleteAsync(user, cancellationToken);
         }
 
         public async Task<List<UserDto>> GetAllUsersAsync(CancellationToken cancellationToken = default)
@@ -58,12 +59,12 @@ namespace Chordy.BusinessLogic.Services
             }
             user.Login = login;
             user.PasswordHash = PasswordHasher.Generate(userRegister.Password);
-            await userRepository.UpdateAsync(user);
+            await userRepository.UpdateAsync(user, cancellationToken);
         }
 
         public async Task<(string accessToken, string refreshToken)> LoginUserAsync(UserRegisterDto userRegisterDto, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetByLoginAsync(userRegisterDto.Login, cancellationToken) ?? throw new Exception("Неверный логин или пароль");
+            var user = await userRepository.GetByLoginAsync(userRegisterDto.Login, cancellationToken) ?? throw new UnauthorizedAccessException("Неверный логин или пароль");
 
             var result = PasswordHasher.Verify(userRegisterDto.Password, user.PasswordHash);
 
@@ -87,8 +88,11 @@ namespace Chordy.BusinessLogic.Services
             return (accessToken, refreshToken);
         }
 
-        public async Task<(string accessToken, string refreshToken, bool isPersistant)> RefreshTokensAsync(string refreshToken, CancellationToken cancellationToken = default)
+        public async Task<(string accessToken, string refreshToken, bool isPersistant)> RefreshTokensAsync(string? refreshToken, CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrEmpty(refreshToken))
+                throw new SecurityException("Refresh token отсутствует");
+
             var tokenEntity = await refreshTokenRepository.GetByTokenAsync(refreshToken, cancellationToken);
             if (tokenEntity == null || tokenEntity.IsRevoked == true || tokenEntity.ExpiresAt < DateTime.UtcNow)
             {

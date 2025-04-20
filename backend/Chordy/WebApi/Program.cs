@@ -1,4 +1,5 @@
-using Chordy.BusinessLogic;
+using Chordy.BusinessLogic.Extensions;
+using Chordy.BusinessLogic.Jwt;
 using Chordy.DataAccess;
 using Microsoft.Extensions.Options;
 
