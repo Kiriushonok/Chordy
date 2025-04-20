@@ -11,5 +11,6 @@ namespace Chordy.BusinessLogic.Interfaces
         Task DeleteAsync(string login, CancellationToken cancellationToken = default);
         Task<(string accessToken, string refreshToken)> LoginUserAsync(UserRegisterDto userRegisterDto, CancellationToken cancellationToken = default);
         Task<(string accessToken, string refreshToken, bool isPersistant)> RefreshTokensAsync(string? refreshToken, CancellationToken cancellationToken = default);
+        Task LogoutAsync(string? refreshToken, CancellationToken cancellationToken = default);
     }
 }

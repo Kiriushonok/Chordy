@@ -14,7 +14,16 @@ namespace Chordy.BusinessLogic.Jwt
 
         public string GenerateToken(User user)
         {
-            Claim[] claims = [new("userId", user.Id.ToString())];
+            var claims = new List<Claim>
+            {
+                new Claim("userId", user.Id.ToString()),
+            };
+
+            var roles = user.UserRoles.Select(ur => ur.Role.Name);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var signingCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey)),

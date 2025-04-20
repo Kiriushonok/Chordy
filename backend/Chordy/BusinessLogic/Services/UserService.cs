@@ -69,7 +69,7 @@ namespace Chordy.BusinessLogic.Services
             var result = PasswordHasher.Verify(userRegisterDto.Password, user.PasswordHash);
 
             if (result == false) {
-                throw new InvalidOperationException("Неверный логин или пароль");
+                throw new UnauthorizedAccessException("Неверный логин или пароль");
             }
 
             var accessToken = jwtProvider.GenerateToken(user);
@@ -118,6 +118,19 @@ namespace Chordy.BusinessLogic.Services
             await refreshTokenRepository.CreateAsync(newRefreshTokenEntity, cancellationToken);
 
             return (newAccessToken, newRefreshToken, isPersistent);
+        }
+
+        public async Task LogoutAsync(string? refreshToken, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(refreshToken))
+                return;
+
+            var tokenEntity = await refreshTokenRepository.GetByTokenAsync(refreshToken, cancellationToken);
+            if (tokenEntity != null && !tokenEntity.IsRevoked)
+            {
+                tokenEntity.IsRevoked = true;
+                await refreshTokenRepository.UpdateAsync(tokenEntity, cancellationToken);
+            }
         }
     }
 }

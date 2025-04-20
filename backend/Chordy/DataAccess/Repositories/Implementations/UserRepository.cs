@@ -30,7 +30,8 @@ namespace Chordy.DataAccess.Repositories.Implementations
 
         public async Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken = default)
         {
-            return await context.users.FirstOrDefaultAsync(user => user.Login == login, cancellationToken);
+            return await context.users.Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role).FirstOrDefaultAsync(user => user.Login == login, cancellationToken);
         }
 
         public async Task UpdateAsync(User user, CancellationToken cancellationToken = default)

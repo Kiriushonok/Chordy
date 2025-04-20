@@ -10,6 +10,7 @@ namespace Chordy.WebApi.Controllers
     public class AuthorController(IAuthorService authorService) : ControllerBase
     {
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateAuthorAsync([FromForm] AuthorCreateDto authorCreateDto, CancellationToken cancellationToken)
         {
             var author = await authorService.CreateAsync(authorCreateDto, cancellationToken);
@@ -36,15 +37,15 @@ namespace Chordy.WebApi.Controllers
             var authors = await authorService.GetAllAsync(cancellationToken);
             return Ok(authors);
         }
-        [Authorize]
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateAuthorAsync([FromRoute] int id, [FromForm] AuthorCreateDto authorCreateDto, CancellationToken cancellationToken)
         {
             await authorService.UpdateAsync(id, authorCreateDto, cancellationToken);
             return NoContent();
         }
-        [Authorize]
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteAuthorAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
             await authorService.DeleteAsync(id, cancellationToken);

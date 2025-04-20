@@ -9,6 +9,8 @@ namespace Chordy.DataAccess
         public DbSet<Collection> collections { get; set; }
         public DbSet<User> users { get; set; }
         public DbSet<RefreshToken> refreshTokens { get; set; }
+        public DbSet<Role> roles { get; set; }
+        public DbSet<UserRole> userRoles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Author>().HasKey(x => x.Id);
@@ -42,6 +44,22 @@ namespace Chordy.DataAccess
             });
             modelBuilder.Entity<User>().Property(x => x.PasswordHash).IsRequired();
             modelBuilder.Entity<User>().Property(x => x.PasswordHash).HasMaxLength(128);
+
+            modelBuilder.Entity<Role>().HasKey(x => x.Id);
+            modelBuilder.Entity<Role>().Property(x => x.Name).IsRequired().HasMaxLength(30);
+            modelBuilder.Entity<Role>().HasIndex(x => x.Name).IsUnique();
+
+            modelBuilder.Entity<UserRole>().HasKey(ur => new { ur.UserId, ur.RoleId });
+
+            modelBuilder.Entity<UserRole>()
+                .HasOne(ur => ur.User)
+                .WithMany(u => u.UserRoles)
+                .HasForeignKey(ur => ur.UserId);
+
+            modelBuilder.Entity<UserRole>()
+                .HasOne(ur => ur.Role)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(ur => ur.RoleId);
 
 
             base.OnModelCreating(modelBuilder);

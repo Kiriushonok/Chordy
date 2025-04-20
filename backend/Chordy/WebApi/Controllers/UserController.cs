@@ -19,7 +19,7 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpGet("{login}")]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetUserByLoginAsync([FromRoute] string login, CancellationToken cancellationToken)
         {
             var user = await userService.GetUserByLoginAsync(login, cancellationToken);
@@ -27,7 +27,7 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAllUsersAsync(CancellationToken cancellationToken) 
         { 
             var users = await userService.GetAllUsersAsync(cancellationToken);
@@ -35,7 +35,7 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpPut("{login}")]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateUserAsync([FromRoute] string login, [FromBody] UserRegisterDto userRegisterDto, CancellationToken cancellationToken)
         {
             await userService.UpdateAsync(login, userRegisterDto, cancellationToken);
@@ -43,7 +43,7 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpDelete("{login}")]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteUserAsync([FromRoute] string login, CancellationToken cancellationToken)
         {
             await userService.DeleteAsync(login, cancellationToken);
@@ -98,6 +98,19 @@ namespace Chordy.WebApi.Controllers
             }
             Response.Cookies.Append("access_token", newAccessToken, accessCookieOptions);
             Response.Cookies.Append("refresh_token", newRefreshToken, refreshCookieOptions);
+
+            return Ok();
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> LogoutAsync(CancellationToken cancellationToken)
+        {
+            var refreshToken = Request.Cookies["refresh_token"];
+            await userService.LogoutAsync(refreshToken, cancellationToken);
+
+            // Удаляем куки
+            Response.Cookies.Delete("access_token");
+            Response.Cookies.Delete("refresh_token");
 
             return Ok();
         }

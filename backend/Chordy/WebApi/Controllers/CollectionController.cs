@@ -10,7 +10,7 @@ namespace Chordy.WebApi.Controllers
     public class CollectionController(ICollectionService collectionService) : ControllerBase
     {
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> CreateCollectionAsync([FromBody] CollectionCreateDto collectionDto, CancellationToken cancellationToken) 
         {
             var collection = await collectionService.CreateAsync(collectionDto, cancellationToken);
@@ -32,7 +32,7 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateCollectionAsync([FromRoute] int id, [FromBody] CollectionCreateDto collectionDto, CancellationToken cancellationToken)
         {
             await collectionService.UpdateAsync(id, collectionDto, cancellationToken);
@@ -40,7 +40,7 @@ namespace Chordy.WebApi.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteCollectionAsync([FromRoute] int id, CancellationToken cancellationToken)
         {
             await collectionService.DeleteAsync(id, cancellationToken);
