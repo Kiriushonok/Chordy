@@ -13,6 +13,7 @@ builder.Services.AddDataAcess(builder.Configuration);
 builder.Services.AddBusinessLogic();
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 builder.Services.AddApiAuthentication(builder.Configuration);
+builder.Services.AddHostedService<RefreshTokenCleanupService>();
 
 var app = builder.Build();
 app.UseMiddleware<GlobalExceptionMiddleware>();
@@ -31,7 +32,6 @@ app.UseCookiePolicy(new CookiePolicyOptions
     MinimumSameSitePolicy = SameSiteMode.Strict,
     HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
     Secure = CookieSecurePolicy.Always,
-    
 });
 
 app.UseAuthentication();

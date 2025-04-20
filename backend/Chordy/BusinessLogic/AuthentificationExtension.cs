@@ -33,7 +33,7 @@ namespace Chordy.BusinessLogic
                     {
                         OnMessageReceived = context =>
                         {
-                            context.Token = context.Request.Cookies["tasty-cookie"];
+                            context.Token = context.Request.Cookies["access_token"];
 
                             return Task.CompletedTask;
                         }

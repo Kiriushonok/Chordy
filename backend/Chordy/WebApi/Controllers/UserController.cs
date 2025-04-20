@@ -48,13 +48,56 @@ namespace Chordy.WebApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> LoginUserAsync([FromBody] UserRegisterDto userRegisterDto, CancellationToken cancellationToken)
         {
-            var token = await userService.LoginUserAsync(userRegisterDto, cancellationToken);
-            var cookieOptions = new CookieOptions
+            var (accessToken, refreshToken) = await userService.LoginUserAsync(userRegisterDto, cancellationToken);
+            var accessCookieOptions = new CookieOptions
             {
-                Expires = DateTimeOffset.UtcNow.AddHours(12)
+                Expires = DateTimeOffset.UtcNow.AddMinutes(15)
             };
-            Response.Cookies.Append("tasty-cookie", token, cookieOptions);
-            return Ok(token);
+            var refreshCookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            };
+            if (userRegisterDto.RememberMe)
+            {
+                refreshCookieOptions.Expires = DateTimeOffset.UtcNow.AddDays(30);
+            }
+            Response.Cookies.Append("access_token", accessToken, accessCookieOptions);
+            Response.Cookies.Append("refresh_token", refreshToken, refreshCookieOptions);
+            return Ok();
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshTokenAsync(CancellationToken cancellationToken)
+        {
+            var refreshToken = Request.Cookies["refresh_token"];
+            if (string.IsNullOrEmpty(refreshToken)) 
+                return NoContent();
+
+            var (newAccessToken, newRefreshToken, isPersistent) = await userService.RefreshTokensAsync(refreshToken, cancellationToken);
+            // Обновляем куки
+            var accessCookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+            };
+            var refreshCookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+            };
+            if (isPersistent)
+            {
+                refreshCookieOptions.Expires = DateTimeOffset.UtcNow.AddDays(30);
+                accessCookieOptions.Expires = DateTimeOffset.UtcNow.AddMinutes(15);
+            }
+            Response.Cookies.Append("access_token", newAccessToken, accessCookieOptions);
+            Response.Cookies.Append("refresh_token", newRefreshToken, refreshCookieOptions);
+
+            return Ok();
         }
     }
 }

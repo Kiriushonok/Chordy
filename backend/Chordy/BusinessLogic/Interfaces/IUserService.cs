@@ -9,6 +9,7 @@ namespace Chordy.BusinessLogic.Interfaces
         Task<List<UserDto>> GetAllUsersAsync(CancellationToken cancellationToken = default);
         Task UpdateAsync(string login, UserRegisterDto userRegister, CancellationToken cancellationToken = default);
         Task DeleteAsync(string login, CancellationToken cancellationToken = default);
-        Task<string> LoginUserAsync(UserRegisterDto userRegisterDto, CancellationToken cancellationToken = default);
+        Task<(string accessToken, string refreshToken)> LoginUserAsync(UserRegisterDto userRegisterDto, CancellationToken cancellationToken = default);
+        Task<(string accessToken, string refreshToken, bool isPersistant)> RefreshTokensAsync(string refreshToken, CancellationToken cancellationToken = default);
     }
 }

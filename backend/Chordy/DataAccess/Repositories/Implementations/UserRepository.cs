@@ -23,6 +23,11 @@ namespace Chordy.DataAccess.Repositories.Implementations
             return await context.users.ToListAsync(cancellationToken);
         }
 
+        public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            return await context.users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        }
+
         public async Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken = default)
         {
             return await context.users.FirstOrDefaultAsync(user => user.Login == login, cancellationToken);

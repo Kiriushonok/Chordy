@@ -13,5 +13,6 @@ namespace Chordy.BusinessLogic.Models
         [MaxLength(64, ErrorMessage = "Пароль пользователя не может быть длиннее 64 символов")]
         [MinLength(8, ErrorMessage = "Пароль пользователя не может быть короче 8 символов")]
         public required string Password { get; set; }
+        public bool RememberMe { get; set; }
     }
 }

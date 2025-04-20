@@ -8,6 +8,7 @@ namespace Chordy.DataAccess
         public DbSet<Author> authors { get; set; }
         public DbSet<Collection> collections { get; set; }
         public DbSet<User> users { get; set; }
+        public DbSet<RefreshToken> refreshTokens { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Author>().HasKey(x => x.Id);
