@@ -6,5 +6,6 @@
         public required string Login { get; set; }
         public required string PasswordHash { get; set; }
         public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+        public ICollection<Song> Songs { get; set; } = new List<Song>();
     }
 }

@@ -15,7 +15,9 @@ public class GlobalExceptionMiddleware
     {
         ["CK_Author_Name_NotEmpty"] = ("Недопустимое значение поля", "Имя автора не может быть пустым."),
         ["CK_Collection_Name_NotEmpty"] = ("Недопустимое значение поля", "Название подборки не может быть пустым."),
-        ["CK_User_Login_NotEmpty"] = ("Недопустимое значение поля", "Логин пользователя не может быть пустым.")
+        ["CK_User_Login_NotEmpty"] = ("Недопустимое значение поля", "Логин пользователя не может быть пустым."),
+        ["CK_Song_Name_NotEmpty"] = ("Недопустимое значение поля", "Название песни не может быть пустым."),
+        ["CK_Song_Text_NotTooSmall"] = ("Недопустимое значение поля", "Текст песни не может быть меньше 50 символов."),
     };
 
     public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
