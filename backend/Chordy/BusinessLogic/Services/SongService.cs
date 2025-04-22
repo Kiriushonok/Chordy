@@ -32,9 +32,8 @@ namespace Chordy.BusinessLogic.Services
 
             await songRepository.CreateAsync(song, cancellationToken);
 
-            var createdSong = await songRepository.GetByIdAsync(song.Id, cancellationToken);
-            if (createdSong == null)
-                throw new KeyNotFoundException($"Произошла ошибка при создании песни");
+            var createdSong = await songRepository.GetByIdAsync(song.Id, cancellationToken) 
+                ?? throw new KeyNotFoundException($"Произошла ошибка при создании песни");
             return SongMapper.ToDto(createdSong);
         }
 
@@ -53,18 +52,16 @@ namespace Chordy.BusinessLogic.Services
 
         public async Task<List<SongDto>> GetByAuthorIdAsync(int authorId, CancellationToken cancellationToken = default)
         {
-            var author = await authorRepository.GetByIdAsync(authorId, cancellationToken);
-            if (author == null)
-                throw new KeyNotFoundException($"Автор с ID {authorId} не найден");
+            var author = await authorRepository.GetByIdAsync(authorId, cancellationToken) 
+                ?? throw new KeyNotFoundException($"Автор с ID {authorId} не найден");
             var songs = await songRepository.GetByAuthorIdAsync(authorId, cancellationToken);
             return songs.Select(SongMapper.ToDto).ToList();
         }
 
         public async Task<List<SongDto>> GetByCollectionIdAsync(int collectionId, CancellationToken cancellationToken = default)
         {
-            var collection = await collectionRepository.GetByIdAsync(collectionId, cancellationToken);
-            if (collection == null)
-                throw new KeyNotFoundException($"Подборка с ID {collectionId} не найдена");
+            var collection = await collectionRepository.GetByIdAsync(collectionId, cancellationToken) 
+                ?? throw new KeyNotFoundException($"Подборка с ID {collectionId} не найдена");
             var songs = await songRepository.GetByCollectionIdAsync(collectionId, cancellationToken);
             return songs.Select(SongMapper.ToDto).ToList();
         }
@@ -90,9 +87,8 @@ namespace Chordy.BusinessLogic.Services
 
         public async Task<List<SongDto>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            var user = await userRepository.GetByIdAsync(userId, cancellationToken);
-            if (user == null)
-                throw new KeyNotFoundException($"Пользователь с ID {userId} не найден");
+            var user = await userRepository.GetByIdAsync(userId, cancellationToken) 
+                ?? throw new KeyNotFoundException($"Пользователь с ID {userId} не найден");
             var songs = await songRepository.GetByUserIdAsync(userId, cancellationToken);
             return songs.Select(SongMapper.ToDto).ToList();
         }

@@ -6,112 +6,109 @@ using System.Net;
 using System.Security;
 using System.Text.Json;
 
-public class GlobalExceptionMiddleware
+namespace Chordy.BusinessLogic.Middleware
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<GlobalExceptionMiddleware> _logger;
-
-    private static readonly Dictionary<string, (string Title, string Detail)> CheckConstraintMessages = new()
+    public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
     {
-        ["CK_Author_Name_NotEmpty"] = ("Недопустимое значение поля", "Имя автора не может быть пустым."),
-        ["CK_Collection_Name_NotEmpty"] = ("Недопустимое значение поля", "Название подборки не может быть пустым."),
-        ["CK_User_Login_NotEmpty"] = ("Недопустимое значение поля", "Логин пользователя не может быть пустым."),
-        ["CK_Song_Name_NotEmpty"] = ("Недопустимое значение поля", "Название песни не может быть пустым."),
-        ["CK_Song_Text_NotTooSmall"] = ("Недопустимое значение поля", "Текст песни не может быть меньше 50 символов."),
-    };
+        private readonly RequestDelegate _next = next;
+        private readonly ILogger<GlobalExceptionMiddleware> _logger = logger;
 
-    public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
-    {
-        _next = next;
-        _logger = logger;
-    }
-
-    public async Task InvokeAsync(HttpContext context)
-    {
-        try
+        private static readonly Dictionary<string, (string Title, string Detail)> CheckConstraintMessages = new()
         {
-            await _next(context);
-        }
-        catch (Exception ex)
+            ["CK_Author_Name_NotEmpty"] = ("Недопустимое значение поля", "Имя автора не может быть пустым."),
+            ["CK_Collection_Name_NotEmpty"] = ("Недопустимое значение поля", "Название подборки не может быть пустым."),
+            ["CK_User_Login_NotEmpty"] = ("Недопустимое значение поля", "Логин пользователя не может быть пустым."),
+            ["CK_Song_Name_NotEmpty"] = ("Недопустимое значение поля", "Название песни не может быть пустым."),
+            ["CK_Song_Text_NotTooSmall"] = ("Недопустимое значение поля", "Текст песни не может быть меньше 50 символов."),
+        };
+
+        public async Task InvokeAsync(HttpContext context)
         {
-            _logger.LogError(ex, "Произошла необработанная ошибка.");
-            await HandleExceptionAsync(context, ex);
-        }
-    }
-
-    private (int StatusCode, string Title, string Detail, string Type) HandleDbUpdateException(DbUpdateException dbEx)
-    {
-        var postgresEx = dbEx.InnerException as PostgresException;
-        var message = postgresEx?.Message ?? dbEx.InnerException?.Message ?? dbEx.Message;
-
-        if (postgresEx != null)
-        {
-            _logger.LogWarning("PostgreSQL ошибка: SqlState={SqlState}, Constraint={Constraint}, Message={MessageText}",
-                postgresEx.SqlState, postgresEx.ConstraintName ?? "(null)", postgresEx.MessageText);
-
-            if (postgresEx.SqlState == PostgresErrorCodes.UniqueViolation)
+            try
             {
-                return ((int)HttpStatusCode.Conflict, "Нарушение уникальности", "Запись с такими данными уже существует.", "unique-violation");
+                await _next(context);
             }
-
-            if (postgresEx.SqlState == PostgresErrorCodes.StringDataRightTruncation)
+            catch (Exception ex)
             {
-                return ((int)HttpStatusCode.BadRequest, "Превышена длина поля", "Одно из полей превышает допустимую длину.", "string-truncation");
+                _logger.LogError(ex, "Произошла необработанная ошибка.");
+                await HandleExceptionAsync(context, ex);
             }
+        }
 
-            if (postgresEx.SqlState == PostgresErrorCodes.CheckViolation)
+        private (int StatusCode, string Title, string Detail, string Type) HandleDbUpdateException(DbUpdateException dbEx)
+        {
+            var postgresEx = dbEx.InnerException as PostgresException;
+            var message = postgresEx?.Message ?? dbEx.InnerException?.Message ?? dbEx.Message;
+
+            if (postgresEx != null)
             {
-                var constraintName = postgresEx.ConstraintName ?? string.Empty;
+                _logger.LogWarning("PostgreSQL ошибка: SqlState={SqlState}, Constraint={Constraint}, Message={MessageText}",
+                    postgresEx.SqlState, postgresEx.ConstraintName ?? "(null)", postgresEx.MessageText);
 
-                if (CheckConstraintMessages.TryGetValue(constraintName, out var msg))
+                if (postgresEx.SqlState == PostgresErrorCodes.UniqueViolation)
                 {
-                    return ((int)HttpStatusCode.BadRequest, msg.Title, msg.Detail, "check-violation");
+                    return ((int)HttpStatusCode.Conflict, "Нарушение уникальности", "Запись с такими данными уже существует.", "unique-violation");
                 }
 
-                // Неизвестное ограничение — логируем явно
-                _logger.LogWarning("Необработанное ограничение CHECK: {Constraint}", constraintName);
+                if (postgresEx.SqlState == PostgresErrorCodes.StringDataRightTruncation)
+                {
+                    return ((int)HttpStatusCode.BadRequest, "Превышена длина поля", "Одно из полей превышает допустимую длину.", "string-truncation");
+                }
 
-                return ((int)HttpStatusCode.BadRequest, "Ошибка проверки данных",
-                    "Одно из введённых значений не прошло проверку. Убедитесь, что поля заполнены корректно.", "check-violation");
+                if (postgresEx.SqlState == PostgresErrorCodes.CheckViolation)
+                {
+                    var constraintName = postgresEx.ConstraintName ?? string.Empty;
+
+                    if (CheckConstraintMessages.TryGetValue(constraintName, out var msg))
+                    {
+                        return ((int)HttpStatusCode.BadRequest, msg.Title, msg.Detail, "check-violation");
+                    }
+
+                    // Неизвестное ограничение — логируем явно
+                    _logger.LogWarning("Необработанное ограничение CHECK: {Constraint}", constraintName);
+
+                    return ((int)HttpStatusCode.BadRequest, "Ошибка проверки данных",
+                        "Одно из введённых значений не прошло проверку. Убедитесь, что поля заполнены корректно.", "check-violation");
+                }
             }
+
+            _logger.LogError(dbEx, "Ошибка базы данных: {Message}", message);
+            return ((int)HttpStatusCode.InternalServerError, "Ошибка базы данных", "Ошибка при сохранении данных. Проверьте корректность входных данных.", "db-error");
         }
 
-        _logger.LogError(dbEx, "Ошибка базы данных: {Message}", message);
-        return ((int)HttpStatusCode.InternalServerError, "Ошибка базы данных", "Ошибка при сохранении данных. Проверьте корректность входных данных.", "db-error");
-    }
-
-    private (int StatusCode, string Title, string Detail, string Type) MapExceptionToProblem(Exception exception)
-    {
-        return exception switch
+        private (int StatusCode, string Title, string Detail, string Type) MapExceptionToProblem(Exception exception)
         {
-            KeyNotFoundException => ((int)HttpStatusCode.NotFound, "Ресурс не найден", exception.Message, "not-found"),
-            ArgumentException => ((int)HttpStatusCode.BadRequest, "Ошибка в запросе", exception.Message, "bad-request"),
-            DuplicationConflictException => ((int)HttpStatusCode.Conflict, "Конфликт дублирования данных", exception.Message, "conflict"),
-            DbUpdateException dbEx => HandleDbUpdateException(dbEx),
-            UnauthorizedAccessException => ((int)HttpStatusCode.Unauthorized, "Ошибка авторизации", exception.Message, "unauthorized"),
-            SecurityException => ((int)HttpStatusCode.Unauthorized, "Ошибка авторизации", exception.Message, "unauthorized"),
-            // Здесь можно легко добавить новые типы ошибок:
-            // CustomException ex => (...)
-            _ => ((int)HttpStatusCode.InternalServerError, "Ошибка сервера", "Произошла внутренняя ошибка. Подробнее см. журнал.", "server-error")
-        };
-    }
+            return exception switch
+            {
+                KeyNotFoundException => ((int)HttpStatusCode.NotFound, "Ресурс не найден", exception.Message, "not-found"),
+                ArgumentException => ((int)HttpStatusCode.BadRequest, "Ошибка в запросе", exception.Message, "bad-request"),
+                DuplicationConflictException => ((int)HttpStatusCode.Conflict, "Конфликт дублирования данных", exception.Message, "conflict"),
+                DbUpdateException dbEx => HandleDbUpdateException(dbEx),
+                UnauthorizedAccessException => ((int)HttpStatusCode.Unauthorized, "Ошибка авторизации", exception.Message, "unauthorized"),
+                SecurityException => ((int)HttpStatusCode.Unauthorized, "Ошибка авторизации", exception.Message, "unauthorized"),
+                // Здесь можно легко добавить новые типы ошибок:
+                // CustomException ex => (...)
+                _ => ((int)HttpStatusCode.InternalServerError, "Ошибка сервера", "Произошла внутренняя ошибка. Подробнее см. журнал.", "server-error")
+            };
+        }
 
-    private Task HandleExceptionAsync(HttpContext context, Exception exception)
-    {
-        var (statusCode, title, detail, type) = MapExceptionToProblem(exception);
-
-        var problemDetails = new ProblemDetails
+        private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            Status = statusCode,
-            Title = title,
-            Detail = detail,
-            Type = $"https://api.chordy.com/errors/{type}"
-        };
+            var (statusCode, title, detail, type) = MapExceptionToProblem(exception);
 
-        var response = JsonSerializer.Serialize(problemDetails);
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = statusCode;
+            var problemDetails = new ProblemDetails
+            {
+                Status = statusCode,
+                Title = title,
+                Detail = detail,
+                Type = $"https://api.chordy.com/errors/{type}"
+            };
 
-        return context.Response.WriteAsync(response);
+            var response = JsonSerializer.Serialize(problemDetails);
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = statusCode;
+
+            return context.Response.WriteAsync(response);
+        }
     }
 }

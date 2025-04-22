@@ -1,6 +1,7 @@
 using Chordy.BusinessLogic.Authorization;
 using Chordy.BusinessLogic.Extensions;
 using Chordy.BusinessLogic.Jwt;
+using Chordy.BusinessLogic.Middleware;
 using Chordy.DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
