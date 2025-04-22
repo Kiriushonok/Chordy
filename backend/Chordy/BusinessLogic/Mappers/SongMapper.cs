@@ -5,7 +5,7 @@ namespace Chordy.BusinessLogic.Mappers
 {
     public static class SongMapper
     {
-        public static SongDto ToDto(Song song)
+        public static SongDto ToDto(Song song, int favouritesCount = 0)
         {
             return new SongDto
             {
@@ -17,6 +17,7 @@ namespace Chordy.BusinessLogic.Mappers
                 UserId = song.UserId,
                 UserLogin = song.User.Login,
                 IsPublic = song.IsPublic,
+                FavouritesCount = favouritesCount,
                 Authors = song.SongAuthors.Select(sa => new AuthorDto
                 {
                     Id = sa.Author.Id,

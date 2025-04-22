@@ -1,4 +1,5 @@
 ﻿using Chordy.BusinessLogic.Models;
+using Chordy.DataAccess.Entities;
 
 namespace Chordy.BusinessLogic.Interfaces
 {
@@ -12,5 +13,8 @@ namespace Chordy.BusinessLogic.Interfaces
         Task<List<SongDto>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<List<SongDto>> GetByCollectionIdAsync(int collectionId, CancellationToken cancellationToken = default);
         Task<List<SongDto>> GetByAuthorIdAsync(int authorId, CancellationToken cancellationToken = default);
+        Task AddToFavouriteAsync(Guid userId, int songId, CancellationToken cancellationToken = default);
+        Task DeleteFromFavouriteAsync(Guid userId, int songId, CancellationToken cancellationToken = default);
+        Task<List<SongDto>> GetFavouritesAsync(Guid userId, CancellationToken cancellationToken = default);
     }
 }

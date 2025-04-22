@@ -3,6 +3,7 @@ using Chordy.BusinessLogic.Mappers;
 using Chordy.BusinessLogic.Models;
 using Chordy.BusinessLogic.Validators;
 using Chordy.DataAccess.Entities;
+using Chordy.DataAccess.Repositories.Implementations;
 using Chordy.DataAccess.Repositories.Interfaces;
 
 namespace Chordy.BusinessLogic.Services
@@ -12,9 +13,17 @@ namespace Chordy.BusinessLogic.Services
         IUserRepository userRepository,
         IAuthorRepository authorRepository,
         ICollectionRepository collectionRepository,
-        ISongViewRepository songViewRepository
+        ISongViewRepository songViewRepository,
+        ISongFavouriteRepository songFavouriteRepository
         ) : ISongService
     {
+        public async Task AddToFavouriteAsync(Guid userId, int songId, CancellationToken cancellationToken = default)
+        {
+            var song = await songRepository.GetByIdAsync(songId, cancellationToken)
+                ?? throw new KeyNotFoundException($"Песня с Id {songId} не найдена");
+            await songFavouriteRepository.AddFavouriteAsync(userId, songId, cancellationToken);
+        }
+
         public async Task<SongDto> CreateAsync(SongCreateDto dto, CancellationToken cancellationToken = default)
         {
             SongValidator.Validate( dto );
@@ -44,10 +53,22 @@ namespace Chordy.BusinessLogic.Services
             await songRepository.DeleteAsync(song, cancellationToken);
         }
 
+        public async Task DeleteFromFavouriteAsync(Guid userId, int songId, CancellationToken cancellationToken = default)
+        {
+            var song = await songRepository.GetByIdAsync(songId, cancellationToken)
+                ?? throw new KeyNotFoundException($"Песня с Id {songId} не найдена");
+            await songFavouriteRepository.DeleteFavouriteAsync(userId, songId, cancellationToken);
+        }
+
         public async Task<List<SongDto>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var songs = await songRepository.GetAllAsync(cancellationToken);
-            return songs.Select(SongMapper.ToDto).ToList();
+            var songIds = songs.Select(s => s.Id).ToList();
+            var favouritesCounts = await songFavouriteRepository.GetFavouritesCountForSongsAsync(songIds, cancellationToken);
+
+            return songs.Select(song =>
+                SongMapper.ToDto(song, favouritesCounts.TryGetValue(song.Id, out var count) ? count : 0)
+            ).ToList();
         }
 
         public async Task<List<SongDto>> GetByAuthorIdAsync(int authorId, CancellationToken cancellationToken = default)
@@ -55,7 +76,12 @@ namespace Chordy.BusinessLogic.Services
             var author = await authorRepository.GetByIdAsync(authorId, cancellationToken) 
                 ?? throw new KeyNotFoundException($"Автор с ID {authorId} не найден");
             var songs = await songRepository.GetByAuthorIdAsync(authorId, cancellationToken);
-            return songs.Select(SongMapper.ToDto).ToList();
+            var songIds = songs.Select(s => s.Id).ToList();
+            var favouritesCounts = await songFavouriteRepository.GetFavouritesCountForSongsAsync(songIds, cancellationToken);
+
+            return songs.Select(song =>
+                SongMapper.ToDto(song, favouritesCounts.TryGetValue(song.Id, out var count) ? count : 0)
+            ).ToList();
         }
 
         public async Task<List<SongDto>> GetByCollectionIdAsync(int collectionId, CancellationToken cancellationToken = default)
@@ -63,7 +89,12 @@ namespace Chordy.BusinessLogic.Services
             var collection = await collectionRepository.GetByIdAsync(collectionId, cancellationToken) 
                 ?? throw new KeyNotFoundException($"Подборка с ID {collectionId} не найдена");
             var songs = await songRepository.GetByCollectionIdAsync(collectionId, cancellationToken);
-            return songs.Select(SongMapper.ToDto).ToList();
+            var songIds = songs.Select(s => s.Id).ToList();
+            var favouritesCounts = await songFavouriteRepository.GetFavouritesCountForSongsAsync(songIds, cancellationToken);
+
+            return songs.Select(song =>
+                SongMapper.ToDto(song, favouritesCounts.TryGetValue(song.Id, out var count) ? count : 0)
+            ).ToList();
         }
 
         public async Task<SongDto?> GetByIdAsync(int id, Guid? userId = null, CancellationToken cancellationToken = default)
@@ -82,7 +113,9 @@ namespace Chordy.BusinessLogic.Services
                 }
             }
 
-            return SongMapper.ToDto(song);
+            var favouritesCount = await songFavouriteRepository.GetFavouritesCountAsync(id, cancellationToken);
+
+            return SongMapper.ToDto(song, favouritesCount);
         }
 
         public async Task<List<SongDto>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
@@ -90,7 +123,23 @@ namespace Chordy.BusinessLogic.Services
             var user = await userRepository.GetByIdAsync(userId, cancellationToken) 
                 ?? throw new KeyNotFoundException($"Пользователь с ID {userId} не найден");
             var songs = await songRepository.GetByUserIdAsync(userId, cancellationToken);
-            return songs.Select(SongMapper.ToDto).ToList();
+            var songIds = songs.Select(s => s.Id).ToList();
+            var favouritesCounts = await songFavouriteRepository.GetFavouritesCountForSongsAsync(songIds, cancellationToken);
+
+            return songs.Select(song =>
+                SongMapper.ToDto(song, favouritesCounts.TryGetValue(song.Id, out var count) ? count : 0)
+            ).ToList();
+        }
+
+        public async Task<List<SongDto>> GetFavouritesAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            var songs = await songFavouriteRepository.GetFavouritesAsync(userId, cancellationToken);
+            var songIds = songs.Select(s => s.Id).ToList();
+            var favouritesCounts = await songFavouriteRepository.GetFavouritesCountForSongsAsync(songIds, cancellationToken);
+
+            return songs.Select(song =>
+                SongMapper.ToDto(song, favouritesCounts.TryGetValue(song.Id, out var count) ? count : 0)
+            ).ToList();
         }
 
         public async Task UpdateAsync(int id, SongCreateDto songCreateDto, CancellationToken cancellationToken = default)

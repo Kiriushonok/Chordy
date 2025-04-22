@@ -10,6 +10,7 @@
         public Guid UserId { get; set; }
         public required string UserLogin { get; set; }
         public bool IsPublic { get; set; }
+        public int FavouritesCount { get; set; }
         public List<AuthorDto> Authors { get; set; } = new();
         public List<CollectionDto> Collections { get; set; } = new();
     }

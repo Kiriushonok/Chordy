@@ -15,6 +15,7 @@ namespace Chordy.DataAccess
         public DbSet<SongAuthor> songAuthors { get; set; }
         public DbSet<SongCollection> songCollections { get; set; }
         public DbSet<SongViews> songViews { get; set; }
+        public DbSet<SongFavourite> songFavourites { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Авторы
@@ -129,6 +130,19 @@ namespace Chordy.DataAccess
                 .HasOne(sw => sw.Song)
                 .WithMany()
                 .HasForeignKey(sw => sw.SongId);
+
+            // Песня - Избранное
+            modelBuilder.Entity<SongFavourite>().HasKey(sf => new { sf.SongId, sf.UserId });
+
+            modelBuilder.Entity<SongFavourite>()
+                .HasOne(sf => sf.User)
+                .WithMany()
+                .HasForeignKey(sf => sf.UserId);
+
+            modelBuilder.Entity<SongFavourite>()
+                .HasOne(sf => sf.Song)
+                .WithMany()
+                .HasForeignKey(sf => sf.SongId);
 
             base.OnModelCreating(modelBuilder);
         }

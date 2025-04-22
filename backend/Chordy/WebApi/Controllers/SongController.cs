@@ -86,5 +86,41 @@ namespace Chordy.WebApi.Controllers
             await songService.DeleteAsync(id, cancellationToken);
             return NoContent();
         }
+
+        [HttpPost("{id}/favorite")]
+        [Authorize]
+        public async Task<IActionResult> AddToFavorites(int id, CancellationToken cancellationToken)
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
+            await songService.AddToFavouriteAsync(userId, id, cancellationToken);
+            return Ok();
+        }
+
+        [HttpDelete("{id}/favorite")]
+        [Authorize]
+        public async Task<IActionResult> RemoveFromFavorites(int id, CancellationToken cancellationToken)
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
+            await songService.DeleteFromFavouriteAsync(userId, id, cancellationToken);
+            return Ok();
+        }
+
+        [HttpGet("favorites")]
+        [Authorize]
+        public async Task<IActionResult> GetFavorites(CancellationToken cancellationToken)
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
+            var songs = await songService.GetFavouritesAsync(userId, cancellationToken);
+            return Ok(songs);
+        }
     }
 }
