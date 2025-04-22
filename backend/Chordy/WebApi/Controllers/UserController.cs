@@ -56,6 +56,8 @@ namespace Chordy.WebApi.Controllers
             var (accessToken, refreshToken) = await userService.LoginUserAsync(userRegisterDto, cancellationToken);
             var accessCookieOptions = new CookieOptions
             {
+                HttpOnly = true,
+                Secure = true,
                 Expires = DateTimeOffset.UtcNow.AddMinutes(15)
             };
             var refreshCookieOptions = new CookieOptions

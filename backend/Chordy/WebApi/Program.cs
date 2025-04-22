@@ -1,6 +1,9 @@
+using Chordy.BusinessLogic.Authorization;
 using Chordy.BusinessLogic.Extensions;
 using Chordy.BusinessLogic.Jwt;
 using Chordy.DataAccess;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +18,10 @@ builder.Services.AddBusinessLogic();
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 builder.Services.AddApiAuthentication(builder.Configuration);
 builder.Services.AddHostedService<RefreshTokenCleanupService>();
+builder.Services.AddScoped<IAuthorizationHandler, SongOwnerOrAdminHandler>();
+
+builder.Services.AddAuthorizationBuilder().AddPolicy("SongOwnerOrAdmin", policy =>
+        policy.Requirements.Add(new SongOwnerOrAdminRequirements()));
 
 var app = builder.Build();
 app.UseMiddleware<GlobalExceptionMiddleware>();

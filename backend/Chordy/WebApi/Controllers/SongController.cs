@@ -7,7 +7,7 @@ namespace Chordy.WebApi.Controllers
 {
     [ApiController]
     [Route("api/songs")]
-    public class SongController(ISongService songService) : ControllerBase
+    public class SongController(ISongService songService, IAuthorizationService authorizationService) : ControllerBase
     {
         [HttpPost]
         [Authorize]
@@ -56,6 +56,11 @@ namespace Chordy.WebApi.Controllers
         [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] SongCreateDto songCreateDto, CancellationToken cancellationToken)
         {
+            var authorizationResult = await authorizationService.AuthorizeAsync(User, id, "SongOwnerOrAdmin");
+            if (!authorizationResult.Succeeded) {
+                return Forbid();
+            }
+
             await songService.UpdateAsync(id, songCreateDto, cancellationToken);
             return NoContent();
         }
@@ -64,6 +69,12 @@ namespace Chordy.WebApi.Controllers
         [Authorize]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
+            var authorizationResult = await authorizationService.AuthorizeAsync(User, id, "SongOwnerOrAdmin");
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
+
             await songService.DeleteAsync(id, cancellationToken);
             return NoContent();
         }
