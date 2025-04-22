@@ -20,7 +20,15 @@ namespace Chordy.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
         {
-            var song = await songService.GetByIdAsync(id, cancellationToken);
+            Guid? userId = null;
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var userIdClaims = User.FindFirst("userId")?.Value;
+                if (Guid.TryParse(userIdClaims, out var parsedId))
+                    userId = parsedId;
+            }
+
+            var song = await songService.GetByIdAsync(id, userId, cancellationToken);
             return Ok(song);
         }
 

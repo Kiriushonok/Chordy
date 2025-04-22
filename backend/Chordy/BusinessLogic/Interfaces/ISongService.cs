@@ -5,7 +5,7 @@ namespace Chordy.BusinessLogic.Interfaces
     public interface ISongService
     {
         Task<SongDto> CreateAsync(SongCreateDto dto, CancellationToken cancellationToken = default);
-        Task<SongDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<SongDto?> GetByIdAsync(int id, Guid? userId = null, CancellationToken cancellationToken = default);
         Task DeleteAsync(int id, CancellationToken cancellationToken = default);
         Task UpdateAsync(int id, SongCreateDto songCreateDto, CancellationToken cancellationToken = default);
         Task<List<SongDto>> GetAllAsync(CancellationToken cancellationToken = default);

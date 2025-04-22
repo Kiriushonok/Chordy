@@ -11,7 +11,8 @@ namespace Chordy.BusinessLogic.Services
         ISongRepository songRepository,
         IUserRepository userRepository,
         IAuthorRepository authorRepository,
-        ICollectionRepository collectionRepository
+        ICollectionRepository collectionRepository,
+        ISongViewRepository songViewRepository
         ) : ISongService
     {
         public async Task<SongDto> CreateAsync(SongCreateDto dto, CancellationToken cancellationToken = default)
@@ -68,11 +69,22 @@ namespace Chordy.BusinessLogic.Services
             return songs.Select(SongMapper.ToDto).ToList();
         }
 
-        public async Task<SongDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<SongDto?> GetByIdAsync(int id, Guid? userId = null, CancellationToken cancellationToken = default)
         {
-            var song = await songRepository.GetByIdAsync(id, cancellationToken);
-            if (song == null)
-                throw new KeyNotFoundException($"Песня с ID {id} не найдена");
+            var song = await songRepository.GetByIdAsync(id, cancellationToken) 
+                ?? throw new KeyNotFoundException($"Песня с ID {id} не найдена");
+
+            if (userId.HasValue)
+            {
+                bool hasViewed = await songViewRepository.HasUserViewedAsync(userId.Value, id, cancellationToken);
+                if (!hasViewed)
+                {
+                    await songViewRepository.AddViewAsync(userId.Value, id, cancellationToken);
+                    song.Views += 1;
+                    await songRepository.UpdateAsync(song, cancellationToken);
+                }
+            }
+
             return SongMapper.ToDto(song);
         }
 
