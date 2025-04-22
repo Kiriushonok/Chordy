@@ -8,7 +8,7 @@ namespace Chordy.BusinessLogic.Validators
         public static void Validate(CollectionCreateDto collectionCreateDto)
         {
             if (collectionCreateDto == null)
-                throw new ArgumentNullException(nameof(collectionCreateDto), "Данные подборки не могут быть null.");
+                throw new ArgumentNullException(nameof(collectionCreateDto), "Данные подборки не указаны.");
 
             if (string.IsNullOrWhiteSpace(collectionCreateDto.Name))
                 throw new ArgumentException("Имя подборки не может быть пустым или состоять только из пробелов.");

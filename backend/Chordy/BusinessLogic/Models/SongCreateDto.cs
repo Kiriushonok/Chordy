@@ -12,6 +12,7 @@ namespace Chordy.BusinessLogic.Models
         [MaxLength(15000, ErrorMessage = "Текст песни не должен превышать 15000 символов.")]
         [MinLength(50, ErrorMessage = "Текст песни не может быть меньше 50 символов (без пробелов).")]
         public required string Text { get; set; }
+        [Required(ErrorMessage = "Идентификатор пользователя не указан")]
         public Guid UserId { get; set; }
         public bool IsPublic { get; set; } = true;
         public List<int> AuthorIds { get; set; } = new List<int>();

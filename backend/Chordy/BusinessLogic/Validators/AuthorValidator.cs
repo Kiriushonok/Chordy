@@ -8,7 +8,7 @@ namespace Chordy.BusinessLogic.Validators
         public static void Validate(AuthorCreateDto authorCreateDto)
         {
             if (authorCreateDto == null)
-                throw new ArgumentNullException(nameof(authorCreateDto), "Данные автора не могут быть null.");
+                throw new ArgumentNullException(nameof(authorCreateDto), "Данные автора не указаны.");
 
             if (string.IsNullOrWhiteSpace(authorCreateDto.Name))
                 throw new ArgumentException("Имя автора не может быть пустым или состоять только из пробелов.");
