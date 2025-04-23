@@ -15,6 +15,7 @@ namespace Chordy.DataAccess
             serviceCollection.AddScoped<ISongRepository, SongRepository>();
             serviceCollection.AddScoped<ISongViewRepository, SongViewRepository>();
             serviceCollection.AddScoped<ISongFavouriteRepository, SongFavouriteRepository>();
+            serviceCollection.AddScoped<IChordRepository, ChordRepository>();
             serviceCollection.AddDbContext<ChordyDbContext>(x =>
             {
                 x.UseNpgsql(configuration.GetConnectionString("PostgreSQL"));

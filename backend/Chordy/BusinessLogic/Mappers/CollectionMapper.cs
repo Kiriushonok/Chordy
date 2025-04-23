@@ -3,7 +3,7 @@ using Chordy.DataAccess.Entities;
 
 namespace Chordy.BusinessLogic.Mappers
 {
-    public class CollectionMapper
+    public static class CollectionMapper
     {
         public static CollectionDto ToDto(Collection collection)
         {

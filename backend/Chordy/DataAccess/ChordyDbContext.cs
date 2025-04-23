@@ -16,6 +16,7 @@ namespace Chordy.DataAccess
         public DbSet<SongCollection> songCollections { get; set; }
         public DbSet<SongViews> songViews { get; set; }
         public DbSet<SongFavourite> songFavourites { get; set; }
+        public DbSet<Chord> chords { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Авторы
@@ -143,6 +144,17 @@ namespace Chordy.DataAccess
                 .HasOne(sf => sf.Song)
                 .WithMany()
                 .HasForeignKey(sf => sf.SongId);
+
+            // Аккорды
+            modelBuilder.Entity<Chord>().HasKey(ch => ch.Id);
+            modelBuilder.Entity<Chord>().Property(x => x.Name).HasMaxLength(30);
+            modelBuilder.Entity<Chord>().Property(x => x.Name).IsRequired();
+            modelBuilder.Entity<Chord>().HasIndex(x => x.Name).IsUnique();
+            modelBuilder.Entity<Chord>()
+                .ToTable(tb =>
+                {
+                    tb.HasCheckConstraint("CK_Chord_Name_NotEmpty", "length(trim(\"Name\")) > 0");
+                });
 
             base.OnModelCreating(modelBuilder);
         }

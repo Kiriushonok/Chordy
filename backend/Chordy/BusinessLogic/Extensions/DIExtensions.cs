@@ -13,6 +13,7 @@ namespace Chordy.BusinessLogic.Extensions
             serviceCollection.AddScoped<IUserService, UserService>();
             serviceCollection.AddScoped<IJwtProvider, JwtProvider>();
             serviceCollection.AddScoped<ISongService, SongService>();
+            serviceCollection.AddScoped<IChordService, ChordService>();
             return serviceCollection;
         }
     }
