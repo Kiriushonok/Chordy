@@ -1,5 +1,6 @@
 ﻿using Chordy.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Chordy.DataAccess
 {
@@ -17,6 +18,7 @@ namespace Chordy.DataAccess
         public DbSet<SongViews> songViews { get; set; }
         public DbSet<SongFavourite> songFavourites { get; set; }
         public DbSet<Chord> chords { get; set; }
+        public DbSet<ChordVariation> chordVariations { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Авторы
@@ -155,6 +157,17 @@ namespace Chordy.DataAccess
                 {
                     tb.HasCheckConstraint("CK_Chord_Name_NotEmpty", "length(trim(\"Name\")) > 0");
                 });
+
+            // Вариация аккорда
+            modelBuilder.Entity<ChordVariation>().HasKey(x => x.Id);
+            modelBuilder.Entity<ChordVariation>().Property(x => x.Applicatura).IsRequired().HasColumnType("jsonb"); // Явно указываем тип jsonb;
+            modelBuilder.Entity<ChordVariation>().Property(x => x.StartFret).IsRequired();
+            modelBuilder.Entity<ChordVariation>().Property(x => x.Bare).IsRequired();
+            modelBuilder.Entity<ChordVariation>().Property(x => x.FingeringSVG).IsRequired().HasColumnType("bytea"); // Явно указываем тип bytea;
+            modelBuilder.Entity<ChordVariation>()
+                .HasOne(x => x.Chord)
+                .WithMany()
+                .HasForeignKey(x => x.ChordId);
 
             base.OnModelCreating(modelBuilder);
         }

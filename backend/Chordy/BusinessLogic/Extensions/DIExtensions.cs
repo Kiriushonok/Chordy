@@ -14,6 +14,7 @@ namespace Chordy.BusinessLogic.Extensions
             serviceCollection.AddScoped<IJwtProvider, JwtProvider>();
             serviceCollection.AddScoped<ISongService, SongService>();
             serviceCollection.AddScoped<IChordService, ChordService>();
+            serviceCollection.AddScoped<IChordVariationService, ChordVariationService>();
             return serviceCollection;
         }
     }
