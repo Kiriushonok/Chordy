@@ -14,7 +14,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins("http://localhost:3000") // адрес фронта
+            policy.WithOrigins("http://localhost:5173") // адрес фронта
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
