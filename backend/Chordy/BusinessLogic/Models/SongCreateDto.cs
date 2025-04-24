@@ -17,5 +17,6 @@ namespace Chordy.BusinessLogic.Models
         public bool IsPublic { get; set; } = true;
         public List<int> AuthorIds { get; set; } = new List<int>();
         public List<int> CollectionIds { get; set; } = new List<int>();
+        public List<int> DefaultChordVariationIds { get; set; } = new();
     }
 }

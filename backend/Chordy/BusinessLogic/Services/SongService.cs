@@ -2,9 +2,11 @@
 using Chordy.BusinessLogic.Mappers;
 using Chordy.BusinessLogic.Models;
 using Chordy.BusinessLogic.Validators;
+using Chordy.DataAccess;
 using Chordy.DataAccess.Entities;
 using Chordy.DataAccess.Repositories.Implementations;
 using Chordy.DataAccess.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Chordy.BusinessLogic.Services
 {
@@ -14,7 +16,8 @@ namespace Chordy.BusinessLogic.Services
         IAuthorRepository authorRepository,
         ICollectionRepository collectionRepository,
         ISongViewRepository songViewRepository,
-        ISongFavouriteRepository songFavouriteRepository
+        ISongFavouriteRepository songFavouriteRepository,
+        ChordyDbContext context
         ) : ISongService
     {
         public async Task AddToFavouriteAsync(Guid userId, int songId, CancellationToken cancellationToken = default)
@@ -43,6 +46,22 @@ namespace Chordy.BusinessLogic.Services
 
             var createdSong = await songRepository.GetByIdAsync(song.Id, cancellationToken) 
                 ?? throw new KeyNotFoundException($"Произошла ошибка при создании песни");
+
+            foreach (var variationId in dto.DefaultChordVariationIds) 
+            {
+                var chordVariation = await context.chordVariations.FindAsync(variationId);
+                if (chordVariation == null)
+                    throw new KeyNotFoundException($"Вариация аккорда с ID {variationId} не найдена");
+
+                var defaultChordVariation = new DefaultChordVariation
+                {
+                    SongId = song.Id,
+                    ChordVariationId = variationId,
+                };
+                await context.defaultChords.AddAsync(defaultChordVariation, cancellationToken);
+            }
+            await context.SaveChangesAsync(cancellationToken);
+
             return SongMapper.ToDto(createdSong);
         }
 
@@ -115,7 +134,7 @@ namespace Chordy.BusinessLogic.Services
 
             var favouritesCount = await songFavouriteRepository.GetFavouritesCountAsync(id, cancellationToken);
 
-            return SongMapper.ToDto(song, favouritesCount);
+            return SongMapper.ToDto(song, favouritesCount); ;
         }
 
         public async Task<List<SongDto>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)

@@ -1,14 +1,17 @@
 ﻿using Chordy.BusinessLogic.Interfaces;
+using Chordy.BusinessLogic.Mappers;
 using Chordy.BusinessLogic.Models;
 using Chordy.BusinessLogic.Services;
+using Chordy.DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Chordy.WebApi.Controllers
 {
     [ApiController]
     [Route("api/chord-variations")]
-    public class ChordVariationController(IChordVariationService chordVariationService, IAuthorizationService authorizationService) : ControllerBase
+    public class ChordVariationController(IChordVariationService chordVariationService, IAuthorizationService authorizationService, ChordyDbContext context) : ControllerBase
     {
         [HttpPost]
         [Authorize]
@@ -34,6 +37,28 @@ namespace Chordy.WebApi.Controllers
         {
             var variation = await chordVariationService.GetByIdAsync(id, cancellationToken);
             return Ok(variation);
+        }
+
+        [HttpGet("by-song/{songId}")]
+        public async Task<IActionResult> GetChordVariationsForSong(int songId, CancellationToken cancellationToken)
+        {
+            // 1. Получить закреплённые вариации для этой песни (DefaultChords)
+            var defaultVariations = await context.defaultChords
+                .Where(dc => dc.SongId == songId)
+                .Select(dc => dc.ChordVariation)
+                .ToListAsync(cancellationToken);
+
+            // 2. Для каждого аккорда получить все остальные вариации, кроме закреплённой
+            var result = new Dictionary<int, List<ChordVariationDto>>(); // ChordId -> List<ChordVariationDto>
+            foreach (var defaultVar in defaultVariations)
+            {
+                var all = await chordVariationService.GetByChordIdAsync(defaultVar.ChordId, cancellationToken);
+                var others = all.Where(v => v.Id != defaultVar.Id).ToList();
+                result[defaultVar.ChordId] = new List<ChordVariationDto> { ChordVariationMapper.ToDto(defaultVar) };
+                result[defaultVar.ChordId].AddRange(others);
+            }
+
+            return Ok(result);
         }
 
         [HttpGet]

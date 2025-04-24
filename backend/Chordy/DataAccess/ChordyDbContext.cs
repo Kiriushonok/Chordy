@@ -19,6 +19,7 @@ namespace Chordy.DataAccess
         public DbSet<SongFavourite> songFavourites { get; set; }
         public DbSet<Chord> chords { get; set; }
         public DbSet<ChordVariation> chordVariations { get; set; }
+        public DbSet<DefaultChordVariation> defaultChords { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Авторы
@@ -169,6 +170,20 @@ namespace Chordy.DataAccess
                 .HasOne(x => x.Chord)
                 .WithMany()
                 .HasForeignKey(x => x.ChordId);
+
+            // Вариации аккордов по умолчанию
+            modelBuilder.Entity<DefaultChordVariation>().HasKey(dc => new { dc.SongId, dc.ChordVariationId });
+
+            modelBuilder.Entity<DefaultChordVariation>()
+                .HasOne(dc => dc.Song)
+                .WithMany()
+                .HasForeignKey(dc => dc.SongId);
+
+            modelBuilder.Entity<DefaultChordVariation>()
+                .HasOne(dc => dc.ChordVariation)
+                .WithMany()
+                .HasForeignKey(dc => dc.ChordVariationId);
+
 
             base.OnModelCreating(modelBuilder);
         }
