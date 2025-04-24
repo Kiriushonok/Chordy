@@ -16,11 +16,12 @@ namespace Chordy.BusinessLogic.Mappers
                 Applicatura = JsonSerializer.Deserialize<ApplicaturaModel>(entity.Applicatura)!,
                 StartFret = entity.StartFret,
                 Bare = entity.Bare,
-                FingeringSVG = Encoding.UTF8.GetString(entity.FingeringSVG)
+                FingeringSVG = Encoding.UTF8.GetString(entity.FingeringSVG),
+                UserId = entity.UserId,
             };
         }
 
-        public static ChordVariation ToEntity(ChordVariationCreateDto dto)
+        public static ChordVariation ToEntity(ChordVariationCreateDto dto, Guid userId)
         {
             return new ChordVariation
             {
@@ -28,7 +29,8 @@ namespace Chordy.BusinessLogic.Mappers
                 Applicatura = JsonSerializer.Serialize(dto.Applicatura),
                 StartFret = dto.StartFret,
                 Bare = dto.Bare,
-                FingeringSVG = Encoding.UTF8.GetBytes(dto.FingeringSVG)
+                FingeringSVG = Encoding.UTF8.GetBytes(dto.FingeringSVG),
+                UserId = userId
             };
         }
     }

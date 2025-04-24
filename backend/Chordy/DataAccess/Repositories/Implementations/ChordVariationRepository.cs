@@ -18,6 +18,11 @@ namespace Chordy.DataAccess.Repositories.Implementations
             await context.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task<List<ChordVariation>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            return await context.chordVariations.ToListAsync(cancellationToken);
+        }
+
         public async Task<List<ChordVariation>> GetByChordIdAsync(int chordId, CancellationToken cancellationToken = default)
         {
             return await context.chordVariations

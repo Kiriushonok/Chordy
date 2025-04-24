@@ -37,6 +37,7 @@ namespace Chordy.WebApi.Controllers
             var authors = await authorService.GetAllAsync(cancellationToken);
             return Ok(authors);
         }
+
         [HttpPut("{id:int}")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateAuthorAsync([FromRoute] int id, [FromForm] AuthorCreateDto authorCreateDto, CancellationToken cancellationToken)

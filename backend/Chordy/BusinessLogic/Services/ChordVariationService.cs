@@ -9,14 +9,14 @@ namespace Chordy.BusinessLogic.Services
 {
     public class ChordVariationService(IChordVariationRepository chordVariationRepository, IChordRepository chordRepository) : IChordVariationService
     {
-        public async Task<ChordVariationDto> AddAsync(ChordVariationCreateDto dto, CancellationToken cancellationToken = default)
+        public async Task<ChordVariationDto> AddAsync(ChordVariationCreateDto dto, Guid userId, CancellationToken cancellationToken = default)
         {
             ChordVariationValidator.Validate(dto);
             var chord = await chordRepository.GetByIdAsync(dto.ChordId, cancellationToken);
             if (chord == null)
                 throw new KeyNotFoundException($"Аккорд с ID {dto.ChordId} не найден");
 
-            var entity = ChordVariationMapper.ToEntity(dto);
+            var entity = ChordVariationMapper.ToEntity(dto, userId);
             await chordVariationRepository.AddAsync(entity, cancellationToken);
 
             return ChordVariationMapper.ToDto(entity);
@@ -29,6 +29,12 @@ namespace Chordy.BusinessLogic.Services
                 throw new KeyNotFoundException($"Вариация аккорда с ID {id} не найдена");
 
             await chordVariationRepository.DeleteAsync(entity, cancellationToken);
+        }
+
+        public async Task<List<ChordVariationDto>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            var chordsVariations = await chordVariationRepository.GetAllAsync(cancellationToken);
+            return chordsVariations.Select(ChordVariationMapper.ToDto).ToList();
         }
 
         public async Task<List<ChordVariationDto>> GetByChordIdAsync(int chordId, CancellationToken cancellationToken = default)

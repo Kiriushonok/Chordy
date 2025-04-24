@@ -20,6 +20,10 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(J
 builder.Services.AddApiAuthentication(builder.Configuration);
 builder.Services.AddHostedService<RefreshTokenCleanupService>();
 builder.Services.AddScoped<IAuthorizationHandler, SongOwnerOrAdminHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ChordVariationOwnerOrAdminHandler>();
+
+builder.Services.AddAuthorizationBuilder().AddPolicy("ChordVariationOwnerOrAdmin", policy =>
+    policy.Requirements.Add(new ChordVariationOwnerOrAdminRequirements()));
 
 builder.Services.AddAuthorizationBuilder().AddPolicy("SongOwnerOrAdmin", policy =>
         policy.Requirements.Add(new SongOwnerOrAdminRequirements()));

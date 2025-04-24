@@ -160,6 +160,7 @@ namespace Chordy.DataAccess
 
             // Вариация аккорда
             modelBuilder.Entity<ChordVariation>().HasKey(x => x.Id);
+            modelBuilder.Entity<ChordVariation>().Property(x => x.UserId).IsRequired();
             modelBuilder.Entity<ChordVariation>().Property(x => x.Applicatura).IsRequired().HasColumnType("jsonb"); // Явно указываем тип jsonb;
             modelBuilder.Entity<ChordVariation>().Property(x => x.StartFret).IsRequired();
             modelBuilder.Entity<ChordVariation>().Property(x => x.Bare).IsRequired();

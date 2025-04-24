@@ -6,6 +6,7 @@ namespace Chordy.DataAccess.Repositories.Interfaces
     {
         Task<ChordVariation?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
         Task<List<ChordVariation>> GetByChordIdAsync(int chordId, CancellationToken cancellationToken = default);
+        Task<List<ChordVariation>> GetAllAsync(CancellationToken cancellationToken = default);
         Task AddAsync(ChordVariation variation, CancellationToken cancellationToken = default);
         Task UpdateAsync(ChordVariation chordVariation, CancellationToken cancellationToken = default);
         Task DeleteAsync(ChordVariation chordVariation, CancellationToken cancellationToken = default);
