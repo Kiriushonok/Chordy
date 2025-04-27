@@ -11,5 +11,6 @@ namespace Chordy.BusinessLogic.Interfaces
         Task UpdateAsync(int id, AuthorCreateDto authorDto, CancellationToken cancellationToken = default);
         Task DeleteAsync(int id, CancellationToken cancellationToken = default);
         Task<List<AuthorDto>> GetAllAsync(CancellationToken cancellationToken = default);
+        Task<List<PopularAuthorDto>> GetTopAuthorsByViewsAsync(int count = 10, CancellationToken cancellationToken = default);
     }
 }

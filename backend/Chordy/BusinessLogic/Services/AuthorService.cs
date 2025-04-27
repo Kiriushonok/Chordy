@@ -8,7 +8,7 @@ using Chordy.BusinessLogic.Validators;
 using Chordy.BusinessLogic.Utils;
 namespace Chordy.BusinessLogic.Services
 {
-    internal class AuthorService(IAuthorRepository authorRepository) : IAuthorService
+    internal class AuthorService(IAuthorRepository authorRepository, ISongRepository songRepository) : IAuthorService
     {
         public async Task<AuthorDto> CreateAsync(AuthorCreateDto authorCreateDto, CancellationToken cancellationToken = default)
         {
@@ -59,6 +59,28 @@ namespace Chordy.BusinessLogic.Services
             var author = await authorRepository.GetByNameAsync(name, cancellationToken) ?? throw new KeyNotFoundException($"Автор {name} не найден");
 
             return AuthorMapper.ToDto(author);
+        }
+
+        public async Task<List<PopularAuthorDto>> GetTopAuthorsByViewsAsync(int count = 10, CancellationToken cancellationToken = default)
+        {
+            var authors = await authorRepository.GetAllAsync(cancellationToken);
+            var result = new List<PopularAuthorDto>();
+
+            foreach (var author in authors)
+            {
+                var songs = await songRepository.GetByAuthorIdAsync(author.Id, cancellationToken);
+                int totalViews = songs.Sum(s => s.Views);
+
+                result.Add(new PopularAuthorDto
+                {
+                    Id = author.Id,
+                    Name = author.Name,
+                    AvatarPath = author.AvatarPath,
+                    TotalViews = totalViews
+                });
+            }
+
+            return result.OrderByDescending(a => a.TotalViews).Take(count).ToList();
         }
 
         public async Task UpdateAsync(int id, AuthorCreateDto authorCreateDto, CancellationToken cancellationToken = default)
