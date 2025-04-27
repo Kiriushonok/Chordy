@@ -6,3 +6,23 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+html, body, #root {
+  height: 100%;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-content {
+  flex: 1 1 auto;
+}
+
+.header__link.nav-link--active,
+.footer__link.nav-link--active {
+  color: #ffd700;
+  text-decoration: underline;
+}
