@@ -1,0 +1,70 @@
+.song-author-link {
+  display: flex;
+  min-height: 28px;
+  width: 100%;
+}
+
+.song-author-link .main-info {
+  flex: 1;
+  min-width: 0;
+  white-space: normal;
+  word-break: break-word;
+
+}
+
+.song-author-link .author-link,
+.song-author-link .song-link {
+  color: #5095db;
+  transition: color 0.2s;
+  white-space: normal;
+  word-break: break-word;
+  font-size: 1.1rem;
+}
+
+.song-author-link .author-link:hover,
+.song-author-link .song-link:hover {
+  color: #386cba;
+  text-decoration: underline;
+}
+
+.song-author-link .side-info {
+  display: flex;
+  align-items: center;
+}
+
+.song-author-link .views,
+.song-author-link .date {
+  color: #888;
+  font-size: 16px;
+  margin-left: 8px;
+  text-align: right;
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.song-author-link .views-number,
+.song-author-link .date {
+  position: relative;
+  top: -1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.song-author-link .views svg {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  vertical-align: middle;
+}
+
+.author-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #eee;
+  box-shadow: 0 0 2px #bbb;
+  flex-shrink: 0;
+  vertical-align: middle;
+  margin-right: 6px;
+}

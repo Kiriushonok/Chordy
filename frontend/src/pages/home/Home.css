@@ -1,0 +1,32 @@
+.home-main-info {
+  display: flex;
+  gap: 50px;
+  justify-content: space-between;
+  margin: 40px 40px 0 40px;
+}
+
+.home-column {
+  flex: 1;
+  min-width: 260px;
+}
+
+.home-column h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.home-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.home-list-item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #dfdfdf;
+  padding: 6px 0 6px 0;
+  min-height: 28px;
+  justify-content: space-between;
+}

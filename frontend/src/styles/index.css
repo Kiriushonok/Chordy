@@ -23,6 +23,5 @@ html, body, #root {
 
 .header__link.nav-link--active,
 .footer__link.nav-link--active {
-  color: #ffd700;
-  text-decoration: underline;
+  color: #f6cd00;
 }

@@ -21,7 +21,8 @@ namespace Chordy.BusinessLogic.Mappers
                 Authors = song.SongAuthors.Select(sa => new AuthorDto
                 {
                     Id = sa.Author.Id,
-                    Name = sa.Author.Name
+                    Name = sa.Author.Name,
+                    AvatarPath = sa.Author.AvatarPath
                 }).ToList(),
                 Collections = song.SongCollections.Select(sc => new CollectionDto
                 {

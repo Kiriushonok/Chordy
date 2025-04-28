@@ -53,7 +53,7 @@
 
 .header__dropdown-item:hover {
     background: #f0f0f0;
-    color: #2980b9;
+    color: #00ccff;
 }
 
 .header__functions {
@@ -107,5 +107,5 @@
 }
 
 .dropwown-item--active {
-    color: #d4bc00;
+    color: #e19a00;
 }
