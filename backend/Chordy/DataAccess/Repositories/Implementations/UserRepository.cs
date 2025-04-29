@@ -25,7 +25,8 @@ namespace Chordy.DataAccess.Repositories.Implementations
 
         public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return await context.users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            return await context.users.Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
         public async Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken = default)

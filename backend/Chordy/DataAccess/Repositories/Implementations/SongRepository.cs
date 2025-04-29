@@ -21,6 +21,7 @@ namespace Chordy.DataAccess.Repositories.Implementations
         public async Task<List<Song>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             return await context.songs
+                .Where(s => s.IsPublic)
                 .Include(s => s.User)
                 .Include(s => s.SongAuthors).ThenInclude(sa => sa.Author)
                 .Include(s => s.SongCollections).ThenInclude(sc => sc.Collection)
@@ -30,7 +31,7 @@ namespace Chordy.DataAccess.Repositories.Implementations
         public async Task<List<Song>> GetByAuthorIdAsync(int authorId, CancellationToken cancellationToken = default)
         {
             return await context.songs
-                .Where(s => s.SongAuthors.Any(sa => sa.AuthorId == authorId))
+                .Where(s => s.IsPublic && s.SongAuthors.Any(sa => sa.AuthorId == authorId))
                 .Include(s => s.User)
                 .Include(s => s.SongAuthors).ThenInclude(sa => sa.Author)
                 .Include(s => s.SongCollections).ThenInclude(sc => sc.Collection)
@@ -40,7 +41,7 @@ namespace Chordy.DataAccess.Repositories.Implementations
         public async Task<List<Song>> GetByCollectionIdAsync(int collectionId, CancellationToken cancellationToken = default)
         {
             return await context.songs
-                .Where(s => s.SongCollections.Any(sc => sc.CollectionId == collectionId))
+                .Where(s => s.IsPublic && s.SongCollections.Any(sc => sc.CollectionId == collectionId))
                 .Include(s => s.User)
                 .Include(s => s.SongAuthors).ThenInclude(sa => sa.Author)
                 .Include(s => s.SongCollections).ThenInclude(sc => sc.Collection)
