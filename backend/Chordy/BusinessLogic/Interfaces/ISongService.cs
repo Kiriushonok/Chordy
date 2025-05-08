@@ -11,10 +11,11 @@ namespace Chordy.BusinessLogic.Interfaces
         Task UpdateAsync(int id, SongCreateDto songCreateDto, CancellationToken cancellationToken = default);
         Task<List<SongDto>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<List<SongDto>> GetByUserIdAsync(Guid userId, Guid? currentUserId, CancellationToken cancellationToken = default);
-        Task<List<SongDto>> GetByCollectionIdAsync(int collectionId, CancellationToken cancellationToken = default);
+        Task<PagedResult<SongDto>> GetByCollectionPagedAsync(int collectionId, int page, int pageSize, CancellationToken cancellationToken = default);
         Task<List<SongDto>> GetByAuthorIdAsync(int authorId, CancellationToken cancellationToken = default);
         Task AddToFavouriteAsync(Guid userId, int songId, CancellationToken cancellationToken = default);
         Task DeleteFromFavouriteAsync(Guid userId, int songId, CancellationToken cancellationToken = default);
         Task<List<SongDto>> GetFavouritesAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<PagedResult<SongDto>> GetPopularSongsPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default);
     }
 }

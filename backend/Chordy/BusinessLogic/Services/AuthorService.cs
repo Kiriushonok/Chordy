@@ -128,6 +128,7 @@ namespace Chordy.BusinessLogic.Services
                               .Skip((page - 1) * pageSize)
                               .Take(pageSize)
                               .ToList();
+
             return new PagedResult<PopularAuthorDto>
             {
                 Items = paged,

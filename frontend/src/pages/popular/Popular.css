@@ -1,0 +1,51 @@
+.popular-main-info {
+    max-width: 500px;
+    margin: 40px 40px 0 40px;
+  }
+  
+  .popular-header {
+    margin-bottom: 18px;
+  }
+  
+  .popular-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #222;
+  }
+  
+  .popular-list {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .popular-list-item {
+    padding: 6px 0;
+    border-bottom: 1px solid #dfdfdf;
+  }
+  
+  .no-songs {
+    color: #888;
+    margin: 20px 0;
+  }
+  
+  .pagination {
+    display: flex;
+    gap: 8px;
+    margin: 18px 0 0 0;
+    justify-content: center;
+  }
+  .pagination-btn {
+    background: none;
+    border: none;
+    color: #5095db;
+    font-size: 1.1em;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background 0.15s;
+  }
+  .pagination-btn.active,
+  .pagination-btn:hover {
+    background: #e6f0fa;
+    color: #386cba;
+  }

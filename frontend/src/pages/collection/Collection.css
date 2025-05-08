@@ -1,0 +1,60 @@
+.collection-main-info {
+    max-width: 500px;
+    margin: 40px 40px 0 40px;
+  }
+  
+  .collection-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  
+  .collection-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #222;
+  }
+  
+  .collection-name {
+    font-size: 20px;
+    color: #5095db;
+    font-weight: 500;
+  }
+  
+  .collection-list {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .collection-list-item {
+    padding: 6px 0;
+    border-bottom: 1px solid #dfdfdf;
+  }
+  
+  .no-songs {
+    color: #888;
+    margin: 20px 0;
+  }
+  
+  .pagination {
+    display: flex;
+    gap: 8px;
+    margin: 18px 0 0 0;
+    justify-content: center;
+  }
+  .pagination-btn {
+    background: none;
+    border: none;
+    color: #5095db;
+    font-size: 1.1em;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background 0.15s;
+  }
+  .pagination-btn.active,
+  .pagination-btn:hover {
+    background: #e6f0fa;
+    color: #386cba;
+  }
