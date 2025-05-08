@@ -107,5 +107,32 @@ namespace Chordy.BusinessLogic.Services
             author.AvatarPath = authorCreateDto.AvatarPath;
             await authorRepository.UpdateAsync(author, cancellationToken);
         }
+
+        public async Task<PagedResult<PopularAuthorDto>> GetPagedAuthorsAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var authors = await authorRepository.GetAllAsync(cancellationToken);
+            var result = new List<PopularAuthorDto>();
+            foreach (var author in authors)
+            {
+                var songs = await songRepository.GetByAuthorIdAsync(author.Id, cancellationToken);
+                int totalViews = songs.Sum(s => s.Views);
+                result.Add(new PopularAuthorDto
+                {
+                    Id = author.Id,
+                    Name = author.Name,
+                    AvatarPath = author.AvatarPath,
+                    TotalViews = totalViews
+                });
+            }
+            var paged = result.OrderByDescending(a => a.TotalViews)
+                              .Skip((page - 1) * pageSize)
+                              .Take(pageSize)
+                              .ToList();
+            return new PagedResult<PopularAuthorDto>
+            {
+                Items = paged,
+                TotalCount = result.Count
+            };
+        }
     }
 }

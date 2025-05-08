@@ -57,7 +57,17 @@ namespace Chordy.DataAccess.Repositories.Implementations
                 .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
         }
 
-        public async Task<List<Song>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        public async Task<List<Song>> GetPublicByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            return await context.songs
+                .Where(s => s.UserId == userId && s.IsPublic)
+                .Include(s => s.User)
+                .Include(s => s.SongAuthors).ThenInclude(sa => sa.Author)
+                .Include(s => s.SongCollections).ThenInclude(sc => sc.Collection)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<Song>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             return await context.songs
                 .Where(s => s.UserId == userId)

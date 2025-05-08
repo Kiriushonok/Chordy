@@ -68,3 +68,14 @@
   vertical-align: middle;
   margin-right: 6px;
 }
+
+.song-user-login {
+  color: #888;
+  font-size: 0.95em;
+  margin-left: 4px;
+}
+
+.user-login {
+  color: #888;
+  font-weight: 500;
+}

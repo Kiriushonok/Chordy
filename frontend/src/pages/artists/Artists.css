@@ -1,0 +1,85 @@
+.artists-main-info {
+  display: flex;
+  margin: 40px 40px 0 40px;
+}
+
+.artists-column {
+  flex: none;
+  min-width: 320px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.artists-column h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.artists-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.artists-list-item {
+  border-bottom: 1px solid #dfdfdf;
+  padding: 6px 0 6px 0;
+}
+
+.artist-header {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  justify-content: space-between;
+  min-height: 32px;
+}
+
+.arrow {
+  margin-left: 10px;
+  font-size: 18px;
+  transition: transform 0.2s;
+  user-select: none;
+}
+.arrow.expanded {
+  transform: rotate(90deg);
+}
+
+.artist-songs {
+  margin-left: 40px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.loading, .no-songs {
+  color: #888;
+  font-size: 15px;
+  margin: 6px 0 6px 0;
+} 
+
+.pagination {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0 0 0;
+  justify-content: center;
+}
+
+.pagination-btn {
+  background: none;
+  border: none;
+  color: #5095db;
+  font-size: 1.1em;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.pagination-btn.active,
+.pagination-btn:hover {
+  background: #e6f0fa;
+  color: #386cba;
+}

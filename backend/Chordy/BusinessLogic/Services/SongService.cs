@@ -121,6 +121,16 @@ namespace Chordy.BusinessLogic.Services
             var song = await songRepository.GetByIdAsync(id, cancellationToken) 
                 ?? throw new KeyNotFoundException($"Песня с ID {id} не найдена");
 
+            // Проверка доступа
+            if (!song.IsPublic)
+            {
+                if (!userId.HasValue || song.UserId != userId.Value)
+                {
+                    // Не владелец и песня не публичная
+                    throw new UnauthorizedAccessException("Нет доступа к этой песне");
+                }
+            }
+
             if (userId.HasValue)
             {
                 bool hasViewed = await songViewRepository.HasUserViewedAsync(userId.Value, id, cancellationToken);
@@ -137,11 +147,21 @@ namespace Chordy.BusinessLogic.Services
             return SongMapper.ToDto(song, favouritesCount); ;
         }
 
-        public async Task<List<SongDto>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        public async Task<List<SongDto>> GetByUserIdAsync(Guid userId, Guid? currentUserId, CancellationToken cancellationToken = default)
         {
             var user = await userRepository.GetByIdAsync(userId, cancellationToken) 
                 ?? throw new KeyNotFoundException($"Пользователь с ID {userId} не найден");
-            var songs = await songRepository.GetByUserIdAsync(userId, cancellationToken);
+            List<Song> songs;
+            if (currentUserId.HasValue && currentUserId.Value == userId)
+            {
+                // Запрашивает сам пользователь — показываем все его песни
+                songs = await songRepository.GetAllByUserIdAsync(userId, cancellationToken);
+            }
+            else
+            {
+                // Запрашивает кто-то другой — только публичные
+                songs = await songRepository.GetPublicByUserIdAsync(userId, cancellationToken);
+            }
             var songIds = songs.Select(s => s.Id).ToList();
             var favouritesCounts = await songFavouriteRepository.GetFavouritesCountForSongsAsync(songIds, cancellationToken);
 

@@ -10,7 +10,8 @@ namespace Chordy.DataAccess.Repositories.Interfaces
         Task UpdateAsync(Song song, CancellationToken cancellationToken = default);
         Task DeleteAsync(Song song, CancellationToken cancellationToken = default);
 
-        Task<List<Song>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<List<Song>> GetPublicByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<List<Song>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<List<Song>> GetByCollectionIdAsync(int collectionId, CancellationToken cancellationToken = default);
         Task<List<Song>> GetByAuthorIdAsync(int authorId, CancellationToken cancellationToken = default);
     }

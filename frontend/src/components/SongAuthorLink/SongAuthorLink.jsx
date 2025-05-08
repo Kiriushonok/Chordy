@@ -34,7 +34,12 @@ const SongAuthorLink = ({
             </>
           )}
           {showSongLink && song && (
-            <Link to={`/songs/${song.id}`} className="song-link">{song.name}</Link>
+            <>
+              <Link to={`/songs/${song.id}`} className="song-link">{song.name}</Link>
+              {song.userLogin && (
+                <span className="song-user-login"> &nbsp; <span>от</span> <span className="user-login">{song.userLogin}</span></span>
+              )}
+            </>
           )}
           {children}
         </div>
