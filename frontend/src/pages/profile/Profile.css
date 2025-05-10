@@ -1,0 +1,73 @@
+.profile-main-info {
+  max-width: 600px;
+  margin: 40px 40px 0 40px;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 32px 28px 24px 28px;
+}
+
+.profile-header {
+  margin-bottom: 24px;
+}
+
+.profile-greeting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.profile-hello {
+  font-size: 1.35em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.profile-logout-btn {
+  background-color: #e73727be;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.profile-logout-btn:hover {
+  background-color: #e73727e6;
+}
+
+.profile-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.profile-tab-btn {
+  border: 1.5px solid #ccc;
+  color: #5095db;
+  font-size: 1.08em;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 6px 18px;
+  border-radius: 6px 6px 0 0;
+  transition: background 0.15s, border 0.15s, color 0.15s;
+}
+.profile-tab-btn.active, .profile-tab-btn:hover {
+  background: #e6f0fa;
+  border: 1.5px solid #5095db;
+  color: #386cba;
+}
+
+.profile-list {
+  display: flex;
+  flex-direction: column;
+}
+.profile-list-item {
+  padding: 6px 0;
+  border-bottom: 1px solid #dfdfdf;
+}
+.no-songs {
+  color: #888;
+  margin: 20px 0;
+  text-align: center;
+} 

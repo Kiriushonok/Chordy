@@ -79,3 +79,24 @@
   color: #888;
   font-weight: 500;
 }
+
+.favourites {
+  display: flex;
+  align-items: center;
+  margin-left: 12px;
+  gap: 4px;
+}
+
+.favourites-icon {
+  width: 18px;
+  height: 18px;
+  color: #fffc53;
+  vertical-align: middle;
+}
+
+.favourites-number {
+  position: relative;
+  top: -1px;
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+}
