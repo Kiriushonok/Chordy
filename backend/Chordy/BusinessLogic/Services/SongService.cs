@@ -103,6 +103,28 @@ namespace Chordy.BusinessLogic.Services
             ).ToList();
         }
 
+        public async Task<PagedResult<SongDto>> GetByAuthorIdPagedAsync(int authorId, int page, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var author = await authorRepository.GetByIdAsync(authorId, cancellationToken)
+                ?? throw new KeyNotFoundException($"Автор с ID {authorId} не найден");
+            var songs = await songRepository.GetByAuthorIdAsync(authorId, cancellationToken);
+            var songIds = songs.Select(s => s.Id).ToList();
+            var favouritesCounts = await songFavouriteRepository.GetFavouritesCountForSongsAsync(songIds, cancellationToken);
+
+            var sorted = songs.OrderByDescending(s => s.Views).ToList();
+            var paged = sorted.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            var items = paged.Select(song =>
+                SongMapper.ToDto(song, favouritesCounts.TryGetValue(song.Id, out var count) ? count : 0)
+            ).ToList();
+
+            return new PagedResult<SongDto>
+            {
+                Items = items,
+                TotalCount = sorted.Count
+            };
+        }
+
         public async Task<PagedResult<SongDto>> GetByCollectionPagedAsync(int collectionId, int page, int pageSize, CancellationToken cancellationToken = default)
         {
             var collection = await collectionRepository.GetByIdAsync(collectionId, cancellationToken) 
@@ -240,6 +262,21 @@ namespace Chordy.BusinessLogic.Services
                 Items = items,
                 TotalCount = sorted.Count
             };
+        }
+
+        public async Task<List<SongDto>> SearchSongsByNameAsync(string query, CancellationToken cancellationToken = default)
+        {
+            var songs = await songRepository.GetAllAsync(cancellationToken);
+            var filtered = songs
+                .Where(s => s.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            var songIds = filtered.Select(s => s.Id).ToList();
+            var favouritesCounts = await songFavouriteRepository.GetFavouritesCountForSongsAsync(songIds, cancellationToken);
+
+            return filtered.Select(song =>
+                SongMapper.ToDto(song, favouritesCounts.TryGetValue(song.Id, out var count) ? count : 0)
+            ).ToList();
         }
     }
 }

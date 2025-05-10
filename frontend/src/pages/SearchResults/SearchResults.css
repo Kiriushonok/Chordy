@@ -1,0 +1,40 @@
+.search-main-info {
+    max-width: 500px;
+    margin: 40px 40px 0 40px;
+}
+
+.search-header {
+    margin-bottom: 18px;
+}
+
+.search-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #222;
+}
+
+.search-list-block {
+    margin-bottom: 28px;
+}
+
+.search-section-title {
+    font-size: 20px;
+    font-weight: 500;
+    color: #5095db;
+    margin-bottom: 10px;
+}
+
+.search-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.search-list-item {
+    padding: 6px 0;
+    border-bottom: 1px solid #dfdfdf;
+}
+
+.no-songs {
+    color: #888;
+    margin: 20px 0;
+}

@@ -26,7 +26,7 @@ namespace Chordy.BusinessLogic.Services
             Author author = AuthorMapper.ToEntity(authorCreateDto);
             await authorRepository.CreateAsync(author, cancellationToken);
 
-            return AuthorMapper.ToDto(author);
+            return AuthorMapper.ToDto(author, 0);
         }
 
         public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
@@ -50,15 +50,19 @@ namespace Chordy.BusinessLogic.Services
         public async Task<AuthorDto> GetAuthorByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var author = await authorRepository.GetByIdAsync(id, cancellationToken) ?? throw new KeyNotFoundException($"Автор с ID {id} не найден");
-
-            return AuthorMapper.ToDto(author);
+            var songs = await songRepository.GetByAuthorIdAsync(author.Id, cancellationToken);
+            int totalViews = songs.Sum(s => s.Views);
+            
+            return AuthorMapper.ToDto(author, totalViews);
         }
 
         public async Task<AuthorDto> GetByNameAsync(string name, CancellationToken cancellationToken = default)
         {
             var author = await authorRepository.GetByNameAsync(name, cancellationToken) ?? throw new KeyNotFoundException($"Автор {name} не найден");
+            var songs = await songRepository.GetByAuthorIdAsync(author.Id, cancellationToken);
+            int totalViews = songs.Sum(s => s.Views);
 
-            return AuthorMapper.ToDto(author);
+            return AuthorMapper.ToDto(author, totalViews);
         }
 
         public async Task<List<PopularAuthorDto>> GetTopAuthorsByViewsAsync(int count = 10, CancellationToken cancellationToken = default)
@@ -134,6 +138,23 @@ namespace Chordy.BusinessLogic.Services
                 Items = paged,
                 TotalCount = result.Count
             };
+        }
+
+        public async Task<List<AuthorDto>> SearchAuthorsByNameAsync(string query, CancellationToken cancellationToken = default)
+        {
+            var authors = await authorRepository.GetAllAsync(cancellationToken);
+            var filtered = authors
+                .Where(a => a.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            var result = new List<AuthorDto>();
+            foreach (var author in filtered)
+            {
+                var songs = await songRepository.GetByAuthorIdAsync(author.Id, cancellationToken);
+                int totalViews = songs.Sum(s => s.Views);
+                result.Add(AuthorMapper.ToDto(author, totalViews));
+            }
+            return result;
         }
     }
 }

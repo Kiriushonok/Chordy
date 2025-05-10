@@ -64,7 +64,7 @@ namespace Chordy.WebApi.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict
+                SameSite = SameSiteMode.None
             };
             if (userRegisterDto.RememberMe)
             {
@@ -85,13 +85,13 @@ namespace Chordy.WebApi.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
             };
             var refreshCookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
             };
             if (isPersistent)
             {
@@ -115,6 +115,18 @@ namespace Chordy.WebApi.Controllers
             Response.Cookies.Delete("refresh_token");
 
             return Ok();
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUserAsync(CancellationToken cancellationToken)
+        {
+            var login = User.Identity?.Name;
+            if (string.IsNullOrEmpty(login))
+                return Unauthorized();
+
+            var user = await userService.GetUserByLoginAsync(login, cancellationToken);
+            return Ok(user);
         }
     }
 }

@@ -59,5 +59,12 @@ namespace Chordy.WebApi.Controllers
             var paged = await authorService.GetPagedAuthorsAsync(page, pageSize, cancellationToken);
             return Ok(paged);
         }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchAuthors([FromQuery] string query, CancellationToken cancellationToken)
+        {
+            var authors = await authorService.SearchAuthorsByNameAsync(query, cancellationToken);
+            return Ok(authors);
+        }
     }
 }

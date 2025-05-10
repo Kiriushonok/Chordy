@@ -1,33 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import "./Login.css";
+import "./Register.css";
 
 const API_BASE_URL = "https://localhost:7007";
 
-const Login = () => {
+const Register = () => {
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
-    const [rememberMe, setRememberMe] = useState(false);
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [fieldErrors, setFieldErrors] = useState({});
-    const [loadingLocal, setLoadingLocal] = useState(false);
-    const { user, loading, refreshUser } = useAuth();
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from;
     const directProfile = location.state?.directProfile;
-    const defaultRedirect = "/profile";
-
-    useEffect(() => {
-        if (!loading && user) {
-            if (directProfile) {
-                navigate(defaultRedirect, { replace: true });
-            } else {
-                navigate(from || defaultRedirect, { replace: true });
-            }
-        }
-    }, [loading, user, navigate, from, directProfile]);
 
     // Фронтенд-валидация
     const validate = () => {
@@ -42,6 +29,9 @@ const Login = () => {
         } else if (password.length > 64) {
             errors.password = "Пароль не должен превышать 64 символа";
         }
+        if (password !== confirmPassword) {
+            errors.confirmPassword = "Пароли не совпадают";
+        }
         return errors;
     };
 
@@ -54,18 +44,15 @@ const Login = () => {
             setFieldErrors(errors);
             return;
         }
-        setLoadingLocal(true);
+        setLoading(true);
         try {
-            const response = await fetch(`${API_BASE_URL}/api/users/login`, {
+            const response = await fetch(`${API_BASE_URL}/api/users/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ login, password, rememberMe })
+                body: JSON.stringify({ login, password })
             });
             if (response.ok) {
-                await refreshUser();
-            } else if (response.status === 401) {
-                setError("Неверный логин или пароль");
+                navigate("/login", { state: directProfile ? { from, directProfile: true } : (from ? { from } : undefined) });
             } else if (response.status === 400) {
                 const data = await response.json();
                 if (data.errors) {
@@ -80,6 +67,9 @@ const Login = () => {
                 } else {
                     setError("Ошибка валидации");
                 }
+            } else if (response.status === 409) {
+                const data = await response.json();
+                setError(data.detail || "Пользователь уже существует");
             } else {
                 const data = await response.json().catch(() => ({}));
                 setError(data.message || "Ошибка сервера. Попробуйте позже.");
@@ -87,19 +77,15 @@ const Login = () => {
         } catch (err) {
             setError("Ошибка сети. Попробуйте позже.");
         } finally {
-            setLoadingLocal(false);
+            setLoading(false);
         }
     };
 
-    if (loading) {
-        return <div>Загрузка...</div>;
-    }
-
     return (
-        <div className="login-page">
-            <h2 className="login-title">Вход</h2>
-            <form className="login-form" onSubmit={handleSubmit} noValidate>
-                <label className="login-label">
+        <div className="register-page">
+            <h2 className="register-title">Регистрация</h2>
+            <form className="register-form" onSubmit={handleSubmit} noValidate>
+                <label className="register-label">
                     Логин:
                     <input
                         type="text"
@@ -112,36 +98,40 @@ const Login = () => {
                     />
                     {fieldErrors.login && <div className="field-error">{fieldErrors.login}</div>}
                 </label>
-                <label className="login-label">
+                <label className="register-label">
                     Пароль:
                     <input
                         type="password"
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         required
-                        autoComplete="current-password"
+                        autoComplete="new-password"
                         className={fieldErrors.password ? "input-error" : ""}
                     />
                     {fieldErrors.password && <div className="field-error">{fieldErrors.password}</div>}
                 </label>
-                <label className="remember-label">
+                <label className="register-label">
+                    Подтвердите пароль:
                     <input
-                        type="checkbox"
-                        checked={rememberMe}
-                        onChange={e => setRememberMe(e.target.checked)}
+                        type="password"
+                        value={confirmPassword}
+                        onChange={e => setConfirmPassword(e.target.value)}
+                        required
+                        autoComplete="new-password"
+                        className={fieldErrors.confirmPassword ? "input-error" : ""}
                     />
-                    Запомнить меня
+                    {fieldErrors.confirmPassword && <div className="field-error">{fieldErrors.confirmPassword}</div>}
                 </label>
-                {error && <div className="login-error">{error}</div>}
-                <button type="submit" className="login-btn" disabled={loadingLocal}>
-                    {loadingLocal ? "Вход..." : "Войти"}
+                {error && <div className="register-error">{error}</div>}
+                <button type="submit" className="register-btn" disabled={loading}>
+                    {loading ? "Регистрация..." : "Зарегистрироваться"}
                 </button>
             </form>
-            <div className="login-register-link">
-                Ещё нет аккаунта? <Link to="/register" state={directProfile ? { from, directProfile: true } : (from ? { from } : undefined)}>Зарегистрироваться</Link>
+            <div className="register-login-link">
+                Уже есть аккаунт? <Link to="/login" state={directProfile ? { from, directProfile: true } : (from ? { from } : undefined)}>Войти</Link>
             </div>
         </div>
     );
 };
 
-export default Login;
+export default Register; 

@@ -4,7 +4,7 @@ import SongAuthorLink from "../../components/SongAuthorLink/SongAuthorLink";
 import "./Collection.css";
 
 const API_BASE_URL = "https://localhost:7007";
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 15;
 
 const Collection = () => {
     const { collectionId } = useParams();

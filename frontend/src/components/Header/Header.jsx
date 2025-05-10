@@ -2,12 +2,16 @@ import userIcon from "../../assets/img/user.svg"
 import searchIcon from "../../assets/img/search.svg"
 import "./Header.css"
 import { useState, useRef, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const Header = () => {
     const [collections, setCollections] = useState([]);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropDownRef = useRef(null);
+    const [search, setSearch] = useState("");
+    const navigate = useNavigate();
+    const { user, loading } = useAuth();
 
     useEffect(() => {
         fetch("https://localhost:7007/api/collections")
@@ -52,7 +56,8 @@ const Header = () => {
                         <ul className="header__dropdown-list">
                             {collections.map((col) => (
                                 <li key={col.id}>
-                                    <NavLink to={`/collections/${col.id}`} 
+                                    <NavLink to={`/collections/${col.id}`}
+                                    onClick={() => setDropdownOpen((open) => !open)} 
                                         className={({isActive}) => isActive ? "header__dropdown-item dropwown-item--active" : "header__dropdown-item"} 
                                     >{col.name}
                                     </NavLink>
@@ -69,23 +74,41 @@ const Header = () => {
                 >Добавить подбор</NavLink>
             </nav>
             <div className="header__functions">
-                <NavLink to="/login">
-                    <button className="header__user-btn">
+                    <button 
+                        className="header__user-btn"
+                        onClick={() => {
+                            if (loading) return;
+                            if (user) {
+                                navigate("/profile");
+                            } else {
+                                navigate("/login", { state: { from: "/profile", directProfile: true } });
+                            }
+                        }}
+                        disabled={loading}
+                    >
                         <img src={userIcon} alt="Профиль"></img>
                     </button>
-                </NavLink>
 
-                <div className="header__search-box">
-                    <input 
-                    type="text"
-                    placeholder="Поиск"
-                    className="header__search-input"
-                    >
-                    </input>
-                    <button className="header__search-btn">
-                        <img src={searchIcon} alt="Поиск"></img>
+                <form
+                    className="header__search-box"
+                    onSubmit={e => {
+                        e.preventDefault();
+                        if (search.trim()) {
+                            navigate(`/search?query=${encodeURIComponent(search)}`);
+                        }
+                    }}
+                >
+                    <input
+                        type="text"
+                        placeholder="Поиск"
+                        className="header__search-input"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                    />
+                    <button className="header__search-btn" type="submit">
+                        <img src={searchIcon} alt="Поиск" />
                     </button>
-                </div>
+                </form>
             </div>
         </header>
     );

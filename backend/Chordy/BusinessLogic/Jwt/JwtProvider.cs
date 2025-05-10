@@ -17,6 +17,7 @@ namespace Chordy.BusinessLogic.Jwt
             var claims = new List<Claim>
             {
                 new Claim("userId", user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Login)
             };
 
             var roles = user.UserRoles.Select(ur => ur.Role.Name);

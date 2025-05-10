@@ -17,5 +17,7 @@ namespace Chordy.BusinessLogic.Interfaces
         Task DeleteFromFavouriteAsync(Guid userId, int songId, CancellationToken cancellationToken = default);
         Task<List<SongDto>> GetFavouritesAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<PagedResult<SongDto>> GetPopularSongsPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default);
+        Task<PagedResult<SongDto>> GetByAuthorIdPagedAsync(int authorId, int page, int pageSize, CancellationToken cancellationToken = default);
+        Task<List<SongDto>> SearchSongsByNameAsync(string query, CancellationToken cancellationToken = default);
     }
 }

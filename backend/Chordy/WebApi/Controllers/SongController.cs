@@ -46,6 +46,17 @@ namespace Chordy.WebApi.Controllers
             return Ok(songs);
         }
 
+        [HttpGet("by-author/{authorId}/paged")]
+        public async Task<IActionResult> GetByAuthorPaged(
+            int authorId,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 15,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await songService.GetByAuthorIdPagedAsync(authorId, page, pageSize, cancellationToken);
+            return Ok(result);
+        }
+
         [HttpGet("by-collection/{collectionId}/paged")]
         public async Task<IActionResult> GetByCollectionPaged(
             int collectionId,
@@ -139,6 +150,13 @@ namespace Chordy.WebApi.Controllers
         public async Task<IActionResult> GetPopularSongs([FromQuery] int page = 1, [FromQuery] int pageSize = 15, CancellationToken cancellationToken = default) {
             var result = await songService.GetPopularSongsPagedAsync(page, pageSize, cancellationToken);
             return Ok(result);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchSongs([FromQuery] string query, CancellationToken cancellationToken)
+        {
+            var songs = await songService.SearchSongsByNameAsync(query, cancellationToken);
+            return Ok(songs);
         }
     }
 }
