@@ -27,7 +27,11 @@ function App() {
           <Route path="/artists" element={<Artists />} />
           <Route path="/collections/:collectionId" element={<Collection />} />
           <Route path="/popular" element={<Popular />} />
-          <Route path="/add-song" element={<AddSong/>} />
+          <Route path="/add-song" element={
+            <ProtectedRoute>
+              <AddSong />
+            </ProtectedRoute>
+          } />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/rules" element={<Rules />} />
           <Route path="/login" element={<Login />} />
@@ -38,7 +42,7 @@ function App() {
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
-            } />
+          } />
         </Routes>
       </main>
       <Footer />

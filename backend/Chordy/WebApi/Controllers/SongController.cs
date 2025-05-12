@@ -11,8 +11,14 @@ namespace Chordy.WebApi.Controllers
     {
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Create([FromBody] SongCreateDto songCreateDto, CancellationToken cancellationToken) 
+        public async Task<IActionResult> Create([FromBody] SongCreateDto songCreateDto, CancellationToken cancellationToken)
         {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
+            songCreateDto.UserId = userId;
+
             var song = await songService.CreateAsync(songCreateDto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = song.Id }, song);
         }

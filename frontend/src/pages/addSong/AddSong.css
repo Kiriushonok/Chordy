@@ -1,0 +1,399 @@
+.add-song-main {
+  margin: 40px 40px 0 40px;
+  min-height: 70vh;
+}
+
+.add-song-form {
+  display: flex;
+  gap: 40px;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  min-width: 900px;
+  max-width: 1100px;
+}
+
+.add-song-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 420px;
+  flex: 2;
+}
+
+.add-song-input,
+.add-song-select {
+  width: 400px;
+  padding: 8px 14px;
+  border: 1.5px solid #c7d7ee;
+  border-radius: 7px;
+  font-size: 1.05em;
+  background: #fafdff;
+  transition: border 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(80, 149, 219, 0.04);
+}
+.add-song-input:focus,
+.add-song-select:focus {
+  border: 1.5px solid #5095db;
+  outline: none;
+  box-shadow: 0 0 0 2px #e6f0fa;
+}
+
+.add-song-textarea {
+  padding: 12px 14px;
+  border: 1.5px solid #c7d7ee;
+  border-radius: 7px;
+  font-size: 1.08em;
+  background: #fafdff;
+  min-height: 220px;
+  transition: border 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(80, 149, 219, 0.04);
+  resize: none;
+  margin-bottom: 20px;
+}
+.add-song-textarea:focus {
+  border: 1.5px solid #5095db;
+  outline: none;
+  box-shadow: 0 0 0 2px #e6f0fa;
+}
+
+.add-song-side {
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+  flex: 1;
+}
+
+.add-song-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #fff;
+  border: 1px solid #bdbdbd;
+  border-radius: 8px;
+  padding: 18px 18px 18px 18px;
+  box-shadow: 0 1px 8px rgba(80, 149, 219, 0.07);
+  min-width: 270px;
+}
+
+.add-song-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 8px;
+}
+.add-song-switch input[type="checkbox"] {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  position: absolute;
+}
+.add-song-switch-slider {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  background: #c7d7ee;
+  border-radius: 12px;
+  transition: background 0.2s;
+  display: inline-block;
+}
+.add-song-switch input[type="checkbox"]:checked + .add-song-switch-slider {
+  background: #5095db;
+}
+.add-song-switch-slider:before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: left 0.2s;
+  box-shadow: 0 1px 4px rgba(80, 149, 219, 0.10);
+}
+.add-song-switch input[type="checkbox"]:checked + .add-song-switch-slider:before {
+  left: 19px;
+}
+.add-song-switch-label {
+  font-size: 1em;
+  color: #222;
+}
+
+.add-song-chords-block {
+  min-height: 120px;
+  background: #fff;
+  border: 1px solid #bdbdbd;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px 0 0 0;
+}
+
+.add-song-btn {
+  padding: 10px 0;
+  background: #fff;
+  color: #222;
+  border: 1.5px solid #bdbdbd;
+  border-radius: 7px;
+  font-size: 1.08em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+  box-shadow: 0 1px 4px rgba(80, 149, 219, 0.04);
+  margin-bottom: 0;
+}
+.add-song-btn:disabled {
+  background: #f5f5f5;
+  color: #bdbdbd;
+  cursor: not-allowed;
+}
+
+.add-song-error {
+  color: #d32f2f;
+  font-size: 0.98em;
+  margin-top: 4px;
+}
+.add-song-success {
+  color: #388e3c;
+  font-size: 0.98em;
+  margin-top: 4px;
+}
+
+.add-song-select-multi {
+  width: 400px;
+  min-height: 44px;
+  max-height: 180px;
+  padding: 8px 10px;
+  border: 1.5px solid #c7d7ee;
+  border-radius: 7px;
+  background: #fafdff;
+  font-size: 1.05em;
+  box-shadow: 0 1px 4px rgba(80, 149, 219, 0.04);
+  transition: border 0.2s, box-shadow 0.2s;
+  outline: none;
+  overflow-y: auto;
+  margin-bottom: 0;
+}
+.add-song-select-multi:focus {
+  border: 1.5px solid #5095db;
+  box-shadow: 0 0 0 2px #e6f0fa;
+}
+.add-song-select-multi option {
+  padding: 8px 10px;
+  margin: 4px 0;
+  border-radius: 5px;
+  background: #fafdff;
+  color: #222;
+  transition: background 0.18s, color 0.18s;
+  cursor: pointer;
+}
+.add-song-select-multi option:checked,
+.add-song-select-multi option[selected] {
+  background: #5095db !important;
+  color: #fff !important;
+}
+.add-song-select-multi::-webkit-scrollbar {
+  width: 8px;
+  background: #e6f0fa;
+  border-radius: 7px;
+}
+.add-song-select-multi::-webkit-scrollbar-thumb {
+  background: #b3cbe9;
+  border-radius: 7px;
+}
+.add-song-select-multi:focus-visible {
+  outline: none;
+}
+
+.add-song-dropdown {
+  position: relative;
+  width: 400px;
+  font-size: 1.05em;
+}
+.add-song-dropdown-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  background: #fafdff;
+  border: 1.5px solid #c7d7ee;
+  border-radius: 7px;
+  padding: 8px 14px;
+  box-shadow: 0 1px 4px rgba(80, 149, 219, 0.04);
+  cursor: pointer;
+  transition: border 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.add-song-dropdown-control.open,
+.add-song-dropdown-control:focus {
+  border: 1.5px solid #5095db;
+  box-shadow: 0 0 0 2px #e6f0fa;
+}
+.add-song-dropdown-placeholder {
+  color: #bdbdbd;
+  font-size: 1em;
+}
+.add-song-dropdown-values {
+  color: #222;
+  font-size: 1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.add-song-dropdown-arrow {
+  margin-left: 10px;
+  color: #5095db;
+  font-size: 1.1em;
+  pointer-events: none;
+}
+.add-song-dropdown-list {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1.5px solid #c7d7ee;
+  border-radius: 7px;
+  box-shadow: 0 4px 16px rgba(80, 149, 219, 0.13);
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+}
+.add-song-dropdown-item {
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.add-song-dropdown-item:hover {
+  background: #e6f0fa;
+}
+.add-song-dropdown-item input[type="checkbox"] {
+  margin-right: 10px;
+  accent-color: #5095db;
+  width: 16px;
+  height: 16px;
+}
+.add-song-dropdown-list label {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.add-song-author-autocomplete {
+  position: relative;
+  width: 400px;
+}
+.add-song-author-dropdown {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1.5px solid #c7d7ee;
+  border-radius: 7px;
+  box-shadow: 0 4px 16px rgba(80, 149, 219, 0.13);
+  z-index: 20;
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+}
+.add-song-author-dropdown-item {
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 1em;
+}
+.add-song-author-dropdown-item:hover {
+  background: #e6f0fa;
+}
+.add-song-author-add-btn {
+  color: #5095db;
+  font-weight: 500;
+}
+.add-song-author-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.add-song-author-tag {
+  display: flex;
+  align-items: center;
+  background: #e6f0fa;
+  color: #222;
+  border-radius: 16px;
+  padding: 4px 12px 4px 10px;
+  font-size: 0.98em;
+  font-weight: 500;
+  box-shadow: 0 1px 4px rgba(80, 149, 219, 0.07);
+}
+.add-song-author-tag-remove {
+  background: none;
+  border: none;
+  color: #5095db;
+  font-size: 1.1em;
+  margin-left: 6px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+.add-song-author-tag-remove:hover {
+  background: #dbefff;
+}
+@media (max-width: 1100px) {
+  .add-song-form {
+    flex-direction: column;
+    min-width: unset;
+    max-width: 98vw;
+    padding: 0;
+    gap: 24px;
+  }
+  .add-song-fields, .add-song-side {
+    min-width: unset;
+  }
+  .add-song-controls {
+    min-width: unset;
+  }
+  .add-song-top-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .add-song-select-multi {
+    width: 100%;
+    min-width: unset;
+    max-width: unset;
+  }
+  .add-song-dropdown {
+    width: 100%;
+    min-width: unset;
+    max-width: unset;
+  }
+  .add-song-author-autocomplete {
+    width: 100%;
+    min-width: unset;
+    max-width: unset;
+  }
+} 

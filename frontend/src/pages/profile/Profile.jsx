@@ -16,7 +16,7 @@ const Profile = () => {
         if (!user) return;
         setSongsLoading(true);
         if (activeTab === "my") {
-            fetch(`${API_BASE_URL}/api/songs/by-user/${user.id}`)
+            fetch(`${API_BASE_URL}/api/songs/by-user/${user.id}`, { credentials: "include" })
                 .then(res => res.json())
                 .then(data => setMySongs(data))
                 .finally(() => setSongsLoading(false));

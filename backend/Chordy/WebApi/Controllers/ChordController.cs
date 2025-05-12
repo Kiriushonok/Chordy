@@ -25,6 +25,13 @@ namespace Chordy.WebApi.Controllers
             return Ok(chord);
         }
 
+        [HttpGet("by-name/{name}")]
+        public async Task<IActionResult> GetChordByNameAsync([FromRoute] string name, CancellationToken cancellationToken)
+        {
+            var chord = await chordService.GetByNameAsync(name, cancellationToken);
+            return Ok(chord);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAllChordsAsync(CancellationToken cancellationToken)
         {
@@ -46,6 +53,13 @@ namespace Chordy.WebApi.Controllers
         {
             await chordService.DeleteAsync(id, cancellationToken);
             return NoContent();
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchChords([FromQuery] string query, CancellationToken cancellationToken)
+        {
+            var chords = await chordService.SearchChordsByNameAsync(query, cancellationToken);
+            return Ok(chords);
         }
     }
 }

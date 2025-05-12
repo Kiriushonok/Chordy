@@ -8,7 +8,7 @@ namespace Chordy.BusinessLogic.Models
         public int ChordId { get; set; }
         [Required(ErrorMessage = "Не указана аппликатура.")]
         public ApplicaturaModel Applicatura { get; set; } = null!;
-        [Range(1, 24, ErrorMessage = "Лад должен быть в диапазоне от 1 до 20.")]
+        [Range(1, 24, ErrorMessage = "Лад должен быть в диапазоне от 1 до 24.")]
         public int StartFret { get; set; }
         public bool Bare { get; set; }
         [Required(ErrorMessage = "SVG-картинка обязательна.")]

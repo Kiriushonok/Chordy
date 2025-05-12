@@ -9,5 +9,7 @@ namespace Chordy.BusinessLogic.Interfaces
         Task UpdateAsync(int id, ChordCreateDto chordCreateDto, CancellationToken cancellationToken = default);
         Task DeleteAsync(int id, CancellationToken cancellationToken = default);
         Task<List<ChordDto>> GetAllAsync(CancellationToken cancellationToken = default);
+        Task<ChordDto> GetByNameAsync(string name, CancellationToken cancellationToken = default);
+        Task<List<ChordDto>> SearchChordsByNameAsync(string query, CancellationToken cancellationToken = default);
     }
 }

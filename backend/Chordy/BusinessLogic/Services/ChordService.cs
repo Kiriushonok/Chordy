@@ -49,6 +49,16 @@ namespace Chordy.BusinessLogic.Services
             return ChordMapper.ToDto(chord);
         }
 
+        public async Task<ChordDto> GetByNameAsync(string name, CancellationToken cancellationToken = default)
+        {
+            var chord = await chordRepository.GetByNameAsync(name, cancellationToken);
+            if (chord == null)
+            {
+                throw new KeyNotFoundException($"Аккорд с названием {name} не найден");
+            }
+            return ChordMapper.ToDto(chord);
+        }
+
         public async Task UpdateAsync(int id, ChordCreateDto chordCreateDto, CancellationToken cancellationToken = default)
         {
             ChordValidator.Validate(chordCreateDto);
@@ -59,6 +69,15 @@ namespace Chordy.BusinessLogic.Services
             }
             chord.Name = chordCreateDto.Name;
             await chordRepository.UpdateAsync(chord, cancellationToken);
+        }
+
+        public async Task<List<ChordDto>> SearchChordsByNameAsync(string query, CancellationToken cancellationToken = default)
+        {
+            var chords = await chordRepository.GetAllAsync(cancellationToken);
+            var filtered = chords
+                .Where(c => c.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            return filtered.Select(ChordMapper.ToDto).ToList();
         }
     }
 }

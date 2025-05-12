@@ -10,6 +10,6 @@ namespace Chordy.BusinessLogic.Models
         public required string Name { get; set; }
         public int Id { get; set; }
         public string? AvatarPath { get; set; }
-            public int TotalViews { get; set; } = 0;
+        public int TotalViews { get; set; } = 0;
     }
 }
