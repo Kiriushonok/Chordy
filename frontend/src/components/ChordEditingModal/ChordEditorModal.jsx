@@ -34,46 +34,50 @@ function findBarre(applicatura) {
   return null;
 }
 
-// Функция генерации SVG по аппликатуре
 function generateChordSVG({ applicatura, startFret }) {
   const width = 100;
-  const height = 110;
+  const height = 100;
   const fretCount = 5;
   const stringCount = 6;
-  const fretSpacing = 16;
+  const fretSpacing = 18;
   const stringSpacing = 14;
-  const nutHeight = 7;
+  const nutHeight = 3;
   const marginLeft = 18;
-  const marginTop = 18;
+  const marginTop = 10;
   const circleRadius = 6.5;
-  const fontSize = 9;
-  const lableFontSize = 10;
+  const fontSize = 12;
+  const lableFontSize = 14;
   // Определяем баррэ
   const barre = findBarre(applicatura);
   // SVG строки
-  let svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`;
+  let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
   // Верхняя линия (верх грифа)
-  svg += `<rect x="${marginLeft - 2}" y="${marginTop - nutHeight}" width="${stringSpacing * (stringCount - 1) + 4}" height="${nutHeight}" rx="3" fill="#8886c6" />`;
+  if (startFret === 1) {
+    svg += `<rect x="${marginLeft - 3}" y="${marginTop - nutHeight / 2}" width="${stringSpacing * (stringCount - 1) + 6}" height="${nutHeight}" rx="2" fill="#111"/>`;
+  }
   // Вертикальные линии (струны)
   for (let i = 0; i < stringCount; i++) {
-    svg += `<line x1="${marginLeft + i * stringSpacing}" y1="${marginTop}" x2="${marginLeft + i * stringSpacing}" y2="${marginTop + fretSpacing * fretCount}" stroke="#444" stroke-width="2"/>`;
+    svg += `<line x1="${marginLeft + i * stringSpacing}" y1="${marginTop}" x2="${marginLeft + i * stringSpacing}" y2="${marginTop + fretSpacing * fretCount}" stroke="#2d2d2d" stroke-width="1"/>`;
   }
   // Горизонтальные линии (лады)
   for (let i = 0; i <= fretCount; i++) {
-    svg += `<line x1="${marginLeft}" y1="${marginTop + i * fretSpacing}" x2="${marginLeft + stringSpacing * (stringCount - 1)}" y2="${marginTop + i * fretSpacing}" stroke="#888" stroke-width="${i === 0 ? 3 : 1.5}"/>`;
+    svg += `<line x1="${marginLeft}" y1="${marginTop + i * fretSpacing}" x2="${marginLeft + stringSpacing * (stringCount - 1)}" y2="${marginTop + i * fretSpacing}" stroke="#2d2d2d" stroke-width="1"/>`;
   }
   // Номера ладов слева
   for (let i = 1; i <= fretCount; i++) {
-    svg += `<text x="${marginLeft - 10}" y="${marginTop + i * fretSpacing - fretSpacing / 2 + 4}" text-anchor="middle" font-size="${lableFontSize}" fill="#222">${startFret + i - 1}</text>`;
+    svg += `<text x="${marginLeft - 10}" y="${marginTop + i * fretSpacing - fretSpacing / 2 + 4}" text-anchor="middle" font-size="${lableFontSize}" fill="#111">${startFret + i - 1}</text>`;
   }
   // Баррэ
   if (barre) {
     const fretIdx = barre.fret - startFret + 1;
     if (fretIdx >= 1 && fretIdx <= fretCount) {
-      const y = marginTop + fretIdx * fretSpacing - fretSpacing / 2;
+      // Центр лада: середина между двумя ладами
+      const y = marginTop + (fretIdx - 0.5) * fretSpacing + (circleRadius * 2 - 10)/2;
       const x1 = marginLeft + Math.min(...barre.strings) * stringSpacing;
       const x2 = marginLeft + Math.max(...barre.strings) * stringSpacing;
-      svg += `<rect x="${x1 - circleRadius}" y="${y - circleRadius + 3}" width="${x2 - x1 + 2 * circleRadius}" height="${circleRadius * 2 - 6}" rx="${circleRadius}" fill="#84c8ff" stroke="#444" stroke-width="2"/>`;
+      const barreWidth = (x2 - x1 + 2 * circleRadius) * 0.95;
+      const barreX = x1 + ((x2 - x1 + 2 * circleRadius) - barreWidth) / 2 - circleRadius;
+      svg += `<rect x="${barreX}" y="${y - circleRadius + 3}" width="${barreWidth}" height="${circleRadius * 2 - 10}" rx="${circleRadius * 0.7}" fill="#111" stroke="#111" stroke-width="1"/>`;
     }
   }
   // Обычные прижатия (без смещения)
@@ -85,26 +89,26 @@ function generateChordSVG({ applicatura, startFret }) {
       if (fretIdx >= 1 && fretIdx <= fretCount) {
         const x = marginLeft + sIdx * stringSpacing;
         const y = marginTop + fretIdx * fretSpacing - fretSpacing / 2;
-        svg += `<circle cx="${x}" cy="${y}" r="${circleRadius}" fill="#84c8ff" stroke="#444" stroke-width="2" />`;
-        svg += `<text x="${x}" y="${y + 3}" text-anchor="middle" font-size="${fontSize}" fill="#222" font-weight="bold">${press.finger}</text>`;
+        svg += `<circle cx="${x}" cy="${y}" r="${circleRadius}" fill="#111" stroke="#111" stroke-width="1" />`;
+        svg += `<text x="${x}" y="${y+1}" text-anchor="middle" alignment-baseline="middle" font-size="${fontSize}" fill="#fff" font-family="Arial, Arial Black, sans-serif">${press.finger}</text>`;
       }
     });
   });
   // Метки "X" и "O" сверху
   applicatura.strings.forEach((str, sIdx) => {
     const x = marginLeft + sIdx * stringSpacing;
-    const y = marginTop - 10;
+    const y = marginTop - 5;
     if (str.state === "muted") {
-      svg += `<text x="${x}" y="${y}" text-anchor="middle" font-size="${fontSize + 2}" fill="#e74c3c" font-weight="bold">X</text>`;
+      svg += `<text x="${x}" y="${y}" text-anchor="middle" font-size="${fontSize + 2}" fill="#111" font-weight="bold">X</text>`;
     } else if (str.state === "open") {
-      svg += `<text x="${x}" y="${y}" text-anchor="middle" font-size="${fontSize + 2}" fill="#222" font-weight="bold">O</text>`;
+      svg += `<text x="${x}" y="${y}" text-anchor="middle" font-size="${fontSize + 2}" fill="#111" font-weight="bold">O</text>`;
     }
   });
   svg += `</svg>`;
   return svg;
 }
 
-export default function ChordEditorModal({ open, onClose, onSave }) {
+export default function ChordEditorModal({ open, onClose, onSave, chordError, variationError, initialData }) {
   if (!open) return null;
   const [startFret, setStartFret] = useState(1);
   const [applicatura, setApplicatura] = useState(getDefaultApplicatura(1));
@@ -118,19 +122,25 @@ export default function ChordEditorModal({ open, onClose, onSave }) {
   const modalRef = useRef(null);
   const [chordName, setChordName] = useState("");
 
-  // Сброс состояния при открытии
   useEffect(() => {
     if (open) {
-      setStartFret(1);
-      setApplicatura(getDefaultApplicatura(1));
+      if (initialData) {
+        setChordName(initialData.chordName || "");
+        setStartFret(initialData.startFret || 1);
+        setApplicatura(initialData.applicatura || getDefaultApplicatura(initialData.startFret || 1));
+        setFretInputValue(initialData.startFret ? String(initialData.startFret) : "1");
+      } else {
+        setChordName("");
+        setStartFret(1);
+        setApplicatura(getDefaultApplicatura(1));
+        setFretInputValue("1");
+      }
       setEditing(null);
       setEditingFret(false);
-      setFretInputValue("1");
       setEditingFinger(null);
       setFingerInputValue("");
-      setChordName("");
     }
-  }, [open]);
+  }, [open, initialData]);
 
   // Фокус на input начального лада
   useEffect(() => {
@@ -210,6 +220,18 @@ export default function ChordEditorModal({ open, onClose, onSave }) {
   };
 
   const handleFretClick = (stringIdx, fretIdx) => {
+    // Если по этому месту уже есть прижатие — удаляем его сразу
+    setApplicatura((prev) => {
+      const strings = [...prev.strings];
+      const currFret = startFret + fretIdx;
+      const newPresses = strings[stringIdx].presses.filter(p => p.fret !== currFret);
+      strings[stringIdx] = {
+        ...strings[stringIdx],
+        presses: newPresses,
+        state: newPresses.length > 0 ? 'pressed' : 'open',
+      };
+      return { ...prev, strings };
+    });
     setEditingFinger({ stringIdx, fretIdx });
     setFingerInputValue("");
   };
@@ -219,40 +241,58 @@ export default function ChordEditorModal({ open, onClose, onSave }) {
     const finger = fingerOverride !== undefined
       ? parseInt(fingerOverride, 10)
       : parseInt(fingerInputValue, 10);
+  
+    if (isNaN(finger) || finger < 1 || finger > 4) {
+      setEditingFinger(null);
+      setFingerInputValue("");
+      return;
+    }
+  
     setApplicatura((prev) => {
       const strings = [...prev.strings];
       const currFret = startFret + fretIdx;
-      // Удаляем все прижатия этим пальцем на других ладах на всех струнах
+  
+      // Собираем струны, на которых были удалены прижатия этим пальцем
+      const affectedStrings = new Set();
+  
       for (let i = 0; i < strings.length; i++) {
-        strings[i] = {
-          ...strings[i],
-          presses: strings[i].presses.filter(p => p.finger !== finger || p.fret === currFret),
-        };
+        const oldPresses = strings[i].presses;
+        const newPresses = oldPresses.filter(p => !(p.finger === finger && p.fret !== currFret));
+  
+        if (oldPresses.length !== newPresses.length) {
+          affectedStrings.add(i);
+          strings[i] = {
+            ...strings[i],
+            presses: newPresses,
+          };
+        }
       }
-      // Добавляем новое прижатие, если оно валидно
-      if (!isNaN(finger) && finger >= 1 && finger <= 4) {
-        let presses = strings[stringIdx].presses.filter(p => p.fret !== currFret);
-        presses.push({ fret: currFret, finger });
-        strings[stringIdx] = {
-          ...strings[stringIdx],
-          state: "pressed",
-          presses,
-        };
-      } else {
-        // Просто удаляем прижатие на этом ладу и этой струне (если невалидно)
-        let presses = strings[stringIdx].presses.filter(p => p.fret !== currFret);
-        // Если струна была muted — оставляем muted, иначе open
-        strings[stringIdx] = {
-          ...strings[stringIdx],
-          state: strings[stringIdx].state === "muted" ? "muted" : "open",
-          presses,
-        };
-      }
+  
+      // Добавляем новое прижатие (если его ещё нет)
+      const updatedPresses = strings[stringIdx].presses.filter(p => !(p.finger === finger && p.fret === currFret));
+      updatedPresses.push({ fret: currFret, finger });
+      strings[stringIdx] = {
+        ...strings[stringIdx],
+        presses: updatedPresses,
+        state: "pressed",
+      };
+  
+      // Обновляем состояние струн, с которых были удалены прижатия
+      affectedStrings.forEach((i) => {
+        if (strings[i].presses.length === 0) {
+          strings[i] = { ...strings[i], state: "open" };
+        } else {
+          strings[i] = { ...strings[i], state: "pressed" };
+        }
+      });
+  
       return { ...prev, strings };
     });
+  
     setEditingFinger(null);
     setFingerInputValue("");
   };
+  
 
   const handleFingerInputChange = (e) => {
     const val = e.target.value.replace(/\D/g, "");
@@ -365,6 +405,7 @@ export default function ChordEditorModal({ open, onClose, onSave }) {
             maxLength={50}
             required
           />
+          {chordError && <div className="chord-modal-error">{chordError}</div>}
         </div>
         <div className="chord-editor-table-wrapper">
           <table className="chord-editor-table">
@@ -373,6 +414,7 @@ export default function ChordEditorModal({ open, onClose, onSave }) {
               {renderFretNumbers()}
             </tbody>
           </table>
+          {variationError && <div className="chord-modal-error">{variationError}</div>}
         </div>
         <div className="chord-modal-btns">
           <button onClick={onClose}>Отмена</button>
@@ -387,6 +429,19 @@ export default function ChordEditorModal({ open, onClose, onSave }) {
               fingeringSVG: generateChordSVG({ applicatura, startFret }),
             })}
           >Сохранить</button>
+          <button
+            type="button"
+            onClick={() => {
+              setChordName("");
+              setStartFret(1);
+              setApplicatura(getDefaultApplicatura(1));
+              setFretInputValue("1");
+              setEditing(null);
+              setEditingFret(false);
+              setEditingFinger(null);
+              setFingerInputValue("");
+            }}
+          >Сброс</button>
         </div>
       </div>
     </div>

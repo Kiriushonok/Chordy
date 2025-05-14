@@ -298,3 +298,7 @@ input[type=number] {
 .chord-editor-table-wrapper {
   position: relative;
 } 
+
+.chord-modal-error {
+  color: #ff533f;
+}
