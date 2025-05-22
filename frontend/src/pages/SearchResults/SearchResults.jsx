@@ -45,17 +45,17 @@ const SearchResults = () => {
             <div className="search-list-block">
                 <h3 className="search-section-title">Авторы</h3>
                 <div className="search-list">
-                {authors.length > 0 ? authors.map(author => (
-    <div key={author.id} className="search-list-item">
-        <SongAuthorLink
-            authors={[author]}
-            showSongLink={false}
-            showAuthorLink={true}
-            views={author.totalViews}
-            showViews={true}
-        />
-    </div>
-)) : <div className="no-songs">Нет авторов</div>}
+                    {authors.length > 0 ? authors.map(author => (
+                        <div key={author.id} className="search-list-item">
+                            <SongAuthorLink
+                                authors={[author]}
+                                showSongLink={false}
+                                showAuthorLink={true}
+                                views={author.totalViews}
+                                showViews={true}
+                            />
+                        </div>
+                    )) : <div className="no-songs">Нет авторов</div>}
                 </div>
             </div>
         </div>

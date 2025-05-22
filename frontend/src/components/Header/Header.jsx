@@ -72,6 +72,11 @@ const Header = () => {
                 <NavLink to="/add-song" 
                     className={({isActive}) => isActive ? "header__link nav-link--active" : "header__link"} 
                 >Добавить подбор</NavLink>
+                {user && user.role === "admin" && (
+                  <NavLink to="/admin" className={({isActive}) => isActive ? "header__link nav-link--active" : "header__link"}>
+                    Админ-панель
+                  </NavLink>
+                )}
             </nav>
             <div className="header__functions">
                     <button 

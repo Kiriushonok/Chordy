@@ -156,5 +156,19 @@ namespace Chordy.BusinessLogic.Services
             }
             return result;
         }
+
+        public async Task<AuthorDto> DeleteAvatarAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var author = await authorRepository.GetByIdAsync(id, cancellationToken) ?? throw new KeyNotFoundException($"Автор с ID {id} не найден");
+            if (!string.IsNullOrEmpty(author.AvatarPath))
+            {
+                FileHelper.DeleteAvatar(author.AvatarPath);
+                author.AvatarPath = null;
+                await authorRepository.UpdateAsync(author, cancellationToken);
+            }
+            var songs = await songRepository.GetByAuthorIdAsync(author.Id, cancellationToken);
+            int totalViews = songs.Sum(s => s.Views);
+            return AuthorMapper.ToDto(author, totalViews);
+        }
     }
 }

@@ -13,12 +13,12 @@ const Collection = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [collection, setCollection] = useState(null);
 
-        // Получаем данные о подборке (название)
-        useEffect(() => {
-            fetch(`${API_BASE_URL}/api/collections/${collectionId}`)
-                .then(res => res.json())
-                .then(setCollection);
-        }, [collectionId]);
+    // Получаем данные о подборке (название)
+    useEffect(() => {
+        fetch(`${API_BASE_URL}/api/collections/${collectionId}`)
+            .then(res => res.json())
+            .then(setCollection);
+    }, [collectionId]);
 
     useEffect(() => {
         fetch(`${API_BASE_URL}/api/songs/by-collection/${collectionId}/paged?page=${currentPage}&pageSize=${PAGE_SIZE}`)
@@ -41,7 +41,7 @@ const Collection = () => {
             </div>
             <div className="collection-list">
                 {songs.length > 0 ? (
-                    songs.map((song, idx) => (
+                    songs.map(song => (
                         <div key={song.id} className="collection-list-item">
                             <SongAuthorLink
                                 song={song}

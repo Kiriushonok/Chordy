@@ -73,11 +73,23 @@ function generateChordSVG({ applicatura, startFret }) {
     if (fretIdx >= 1 && fretIdx <= fretCount) {
       // Центр лада: середина между двумя ладами
       const y = marginTop + (fretIdx - 0.5) * fretSpacing + (circleRadius * 2 - 10)/2;
-      const x1 = marginLeft + Math.min(...barre.strings) * stringSpacing;
-      const x2 = marginLeft + Math.max(...barre.strings) * stringSpacing;
-      const barreWidth = (x2 - x1 + 2 * circleRadius) * 0.95;
-      const barreX = x1 + ((x2 - x1 + 2 * circleRadius) - barreWidth) / 2 - circleRadius;
-      svg += `<rect x="${barreX}" y="${y - circleRadius + 3}" width="${barreWidth}" height="${circleRadius * 2 - 10}" rx="${circleRadius * 0.7}" fill="#111" stroke="#111" stroke-width="1"/>`;
+      // Группируем струны по последовательным участкам
+      const sorted = [...barre.strings].sort((a, b) => a - b);
+      let group = [sorted[0]];
+      for (let i = 1; i <= sorted.length; i++) {
+        if (i < sorted.length && sorted[i] === sorted[i - 1] + 1) {
+          group.push(sorted[i]);
+        } else {
+          // Нарисовать баррэ для текущей группы
+          const x1 = marginLeft + group[0] * stringSpacing;
+          const x2 = marginLeft + group[group.length - 1] * stringSpacing;
+          const barreWidth = (x2 - x1 + 2 * circleRadius) * 0.95;
+          const barreX = x1 + ((x2 - x1 + 2 * circleRadius) - barreWidth) / 2 - circleRadius;
+          svg += `<rect x="${barreX}" y="${y - circleRadius + 3}" width="${barreWidth}" height="${circleRadius * 2 - 10}" rx="${circleRadius * 0.7}" fill="#111" stroke="#111" stroke-width="1"/>`;
+          // Начать новую группу, если есть ещё струны
+          if (i < sorted.length) group = [sorted[i]];
+        }
+      }
     }
   }
   // Обычные прижатия (без смещения)

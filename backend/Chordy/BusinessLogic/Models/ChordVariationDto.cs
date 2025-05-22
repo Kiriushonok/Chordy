@@ -9,5 +9,6 @@
         public int StartFret { get; set; }
         public bool Bare { get; set; }
         public string FingeringSVG { get; set; } = null!;
+        public string? ChordName { get; set; }
     }
 }

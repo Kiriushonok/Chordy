@@ -1,6 +1,7 @@
 ﻿using Chordy.BusinessLogic.Models;
 using Chordy.BusinessLogic.Utils;
 using Chordy.DataAccess.Entities;
+using System.Linq;
 
 namespace Chordy.BusinessLogic.Mappers
 {
@@ -12,6 +13,7 @@ namespace Chordy.BusinessLogic.Mappers
             {
                 Login = user.Login,
                 Id = user.Id,
+                Role = user.UserRoles.FirstOrDefault()?.Role.Name
             };
         }
 

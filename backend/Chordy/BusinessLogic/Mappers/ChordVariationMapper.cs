@@ -18,6 +18,7 @@ namespace Chordy.BusinessLogic.Mappers
                 Bare = entity.Bare,
                 FingeringSVG = Encoding.UTF8.GetString(entity.FingeringSVG),
                 UserId = entity.UserId,
+                ChordName = entity.Chord.Name,
             };
         }
 

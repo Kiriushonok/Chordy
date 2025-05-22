@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "./Login.css";
@@ -18,16 +18,24 @@ const Login = () => {
     const from = location.state?.from;
     const directProfile = location.state?.directProfile;
     const defaultRedirect = "/profile";
+    const prevUserRef = useRef();
+    const [wasLoginSubmit, setWasLoginSubmit] = useState(false);
 
     useEffect(() => {
-        if (!loading && user) {
+        if (!loading && user && (wasLoginSubmit || directProfile)) {
             if (directProfile) {
                 navigate(defaultRedirect, { replace: true });
             } else {
                 navigate(from || defaultRedirect, { replace: true });
             }
         }
-    }, [loading, user, navigate, from, directProfile]);
+        prevUserRef.current = user;
+    }, [loading, user, navigate, from, directProfile, wasLoginSubmit]);
+
+    useEffect(() => {
+        refreshUser();
+        // eslint-disable-next-line
+    }, []);
 
     // Фронтенд-валидация
     const validate = () => {
@@ -63,6 +71,7 @@ const Login = () => {
                 body: JSON.stringify({ login, password, rememberMe })
             });
             if (response.ok) {
+                setWasLoginSubmit(true);
                 await refreshUser();
             } else if (response.status === 401) {
                 setError("Неверный логин или пароль");

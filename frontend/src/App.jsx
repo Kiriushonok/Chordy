@@ -15,8 +15,20 @@ import SearchResults from "./pages/SearchResults/SearchResults"
 import Profile from "./pages/profile/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Register from "./pages/register/Register";
+import Song from "./pages/Song/Song";
+import { useEffect } from 'react';
+import AdminPanel from "./pages/admin/AdminPanel";
 
 function App() {
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500&family=JetBrains+Mono:wght@400;700&family=Roboto+Mono:wght@400;700&family=PT+Mono&family=Source+Code+Pro:wght@400;700&display=swap';
+    document.head.appendChild(link);
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
 
   return (
     <BrowserRouter>
@@ -32,6 +44,7 @@ function App() {
               <AddSong />
             </ProtectedRoute>
           } />
+          <Route path="/songs/:id" element={<Song />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/rules" element={<Rules />} />
           <Route path="/login" element={<Login />} />
@@ -41,6 +54,11 @@ function App() {
           <Route path="/profile" element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminPanel />
             </ProtectedRoute>
           } />
         </Routes>

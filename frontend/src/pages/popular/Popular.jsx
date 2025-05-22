@@ -28,7 +28,7 @@ const Popular = () => {
             </div>
             <div className="popular-list">
                 {songs.length > 0 ? (
-                    songs.map((song, idx) => (
+                    songs.map(song => (
                         <div key={song.id} className="popular-list-item">
                             <SongAuthorLink
                                 song={song}

@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import editIcon from '../../assets/img/edit.svg';
 import xmarkIcon from '../../assets/img/xmark.svg';
+import ChordFingeringBlock from "../../components/ChordFingeringBlock";
 
 const API_BASE_URL = "https://localhost:7007";
 
@@ -39,8 +40,11 @@ const AddSong = () => {
     const [fieldErrors, setFieldErrors] = useState({});
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [editingVariation, setEditingVariation] = useState(null);
+    const textareaRef = useRef(null);
+    const [editMode, setEditMode] = useState(false);
+    const [editSongId, setEditSongId] = useState(null);
 
     useEffect(() => {
         fetch(`${API_BASE_URL}/api/collections`)
@@ -102,6 +106,26 @@ const AddSong = () => {
             .catch(() => setAllChords([]));
     }, []);
 
+    useEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto';
+            textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+        }
+    }, [text]);
+
+    useEffect(() => {
+        if (location.state && location.state.song) {
+            const s = location.state.song;
+            setName(s.name || "");
+            setText(s.text || "");
+            setIsPublic(typeof s.isPublic === 'boolean' ? s.isPublic : true);
+            setSelectedAuthors(s.authors || []);
+            setCollectionIds(s.collections ? s.collections.map(col => col.id.toString()) : []);
+            setEditMode(true);
+            setEditSongId(s.id);
+        }
+    }, [location.state]);
+
     const validateName = (value) => {
         if (!value || value.length < 1) return "Название не должно быть пустым";
         if (value.length > 100) return "Название не должно превышать 100 символов";
@@ -157,6 +181,47 @@ const AddSong = () => {
         }
     };
 
+    // Вспомогательная функция для выделения аккордов и получения их вариаций
+    async function getChordsAndVariations(text, allChords) {
+        if (!text) return { chordsArr: [], variationsObj: {}, selectedIdxObj: {} };
+        const chordNames = allChords.map(c => c.name);
+        const lines = text.split(/\r?\n/);
+        const foundChords = new Set();
+        lines.forEach(line => {
+            const trimmed = line.trim();
+            if (!trimmed) return;
+            const words = trimmed.split(/\s+/);
+            if (words.length > 0 && words.every(w => chordNames.includes(w))) {
+                words.forEach(w => foundChords.add(w));
+            }
+        });
+        const chordsArr = Array.from(foundChords);
+        // Загружаем вариации для каждого аккорда
+        const variationsObj = {};
+        const selectedIdxObj = {};
+        await Promise.all(
+            chordsArr.map(async chordName => {
+                const chord = allChords.find(c => c.name === chordName);
+                if (!chord) return;
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/chord-variations/by-chord/${chord.id}`);
+                    if (res.ok) {
+                        const variations = await res.json();
+                        variationsObj[chordName] = variations;
+                        selectedIdxObj[chordName] = 0;
+                    } else {
+                        variationsObj[chordName] = [];
+                        selectedIdxObj[chordName] = 0;
+                    }
+                } catch {
+                    variationsObj[chordName] = [];
+                    selectedIdxObj[chordName] = 0;
+                }
+            })
+        );
+        return { chordsArr, variationsObj, selectedIdxObj };
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
@@ -167,16 +232,22 @@ const AddSong = () => {
             setNameError(nameErr);
             return;
         }
+        // --- Новый блок: выделяем аккорды и вариации прямо перед отправкой ---
+        const { chordsArr, variationsObj, selectedIdxObj } = await getChordsAndVariations(text, allChords);
+        let defaultChordVariationIds = [];
+        chordsArr.forEach(chord => {
+            const variations = variationsObj[chord] || [];
+            const idx = selectedIdxObj[chord] || 0;
+            if (variations[idx]) {
+                defaultChordVariationIds.push(variations[idx].id);
+            }
+        });
+        // --- Обновляем стейты для UI (опционально, чтобы интерфейс тоже обновился) ---
+        setHighlightedChords(chordsArr);
+        setChordVariationsByChord(variationsObj);
+        setSelectedVariationIdx(selectedIdxObj);
         setLoading(true);
         try {
-            let defaultChordVariationIds = [];
-            highlightedChords.forEach(chord => {
-                const variations = chordVariationsByChord[chord] || [];
-                const idx = selectedVariationIdx[chord] || 0;
-                if (variations[idx]) {
-                    defaultChordVariationIds.push(variations[idx].id);
-                }
-            });
             const body = {
                 name,
                 text,
@@ -185,12 +256,44 @@ const AddSong = () => {
                 collectionIds: collectionIds.map(Number),
                 defaultChordVariationIds
             };
-            const res = await fetchWithRefresh(`${API_BASE_URL}/api/songs`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify(body),
-            });
+            let res;
+            if (editMode && editSongId) {
+                res = await fetchWithRefresh(`${API_BASE_URL}/api/songs/${editSongId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify(body),
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    if (err && err.errors) {
+                        setError(err.detail || "Недопустимое значение поля");
+                        setFieldErrors(err.errors);
+                    } else {
+                        setError(err?.detail || err?.title || err?.message || "Ошибка при добавлении песни");
+                    }
+                    setLoading(false);
+                    return;
+                }
+                navigate(`/songs/${editSongId}`);
+                setSuccess(true);
+                setName("");
+                setSelectedAuthors([]);
+                setCollectionIds([]);
+                setText("");
+                setIsPublic(true);
+                setHighlightedChords([]);
+                setChordVariationsByChord({});
+                setSelectedVariationIdx({});
+                return;
+            } else {
+                res = await fetchWithRefresh(`${API_BASE_URL}/api/songs`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify(body),
+                });
+            }
             if (!res.ok) {
                 const err = await res.json().catch(() => ({}));
                 if (err && err.errors) {
@@ -202,12 +305,17 @@ const AddSong = () => {
                 setLoading(false);
                 return;
             }
+            const song = await res.json();
+            navigate(`/songs/${song.id}`);
             setSuccess(true);
             setName("");
             setSelectedAuthors([]);
             setCollectionIds([]);
             setText("");
             setIsPublic(true);
+            setHighlightedChords([]);
+            setChordVariationsByChord({});
+            setSelectedVariationIdx({});
         } catch (e) {
             if (e.message === "Failed to refresh token") {
                 navigate("/login", {
@@ -228,8 +336,20 @@ const AddSong = () => {
         }
     };
 
-    const handleAddChord = () => {
-        setChordEditorOpen(true);
+    const handleAddChord = async () => {
+        if (authLoading) return;
+        if (!user) {
+            navigate("/login", { state: { from: location.pathname, action: "add-chord" }, replace: true });
+            return;
+        }
+        try {
+            await fetchWithRefresh(`${API_BASE_URL}/api/users/me`);
+            setChordEditorOpen(true);
+        } catch (e) {
+            if (e.message === "Failed to refresh token") {
+                navigate("/login", { state: { from: location.pathname, action: "add-chord" }, replace: true });
+            }
+        }
     };
 
     const handleChordSave = async (data) => {
@@ -426,12 +546,21 @@ const AddSong = () => {
     };
 
     // Открыть модалку для редактирования
-    const handleEditVariation = (variation, chordName) => {
-        setEditingVariation({
-            ...variation,
-            chordName: chordName,
-        });
-        setChordEditorOpen(true);
+    const handleEditVariation = async (variation, chordName) => {
+        if (authLoading) return;
+        if (!user) {
+            navigate("/login", { state: { from: location.pathname, action: "edit-chord" }, replace: true });
+            return;
+        }
+        try {
+            await fetchWithRefresh(`${API_BASE_URL}/api/users/me`);
+            setEditingVariation({ ...variation, chordName });
+            setChordEditorOpen(true);
+        } catch (e) {
+            if (e.message === "Failed to refresh token") {
+                navigate("/login", { state: { from: location.pathname, action: "edit-chord" }, replace: true });
+            }
+        }
     };
 
     // Обновление вариации
@@ -609,6 +738,7 @@ const AddSong = () => {
                         onChange={e => setText(e.target.value)}
                         rows={12}
                         required
+                        ref={textareaRef}
                     />
                 </div>
                 <div className="add-song-side">
@@ -617,36 +747,24 @@ const AddSong = () => {
                             {/* Блок для аппликатур аккордов */}
                             {highlightedChords.length > 0 && (
                                 <div className="add-song-chords-list">
-                                    {highlightedChords.map(chord => {
-                                        const variations = chordVariationsByChord[chord] || [];
-                                        const idx = selectedVariationIdx[chord] || 0;
-                                        const current = variations[idx];
+                                    {highlightedChords.map((chordName) => {
+                                        const chordObj = allChords.find(c => c.name === chordName);
+                                        if (!chordObj) return null;
+                                        const variations = chordVariationsByChord[chordName] || [];
+                                        const idx = selectedVariationIdx[chordName] || 0;
                                         return (
-                                            <div key={chord} className="chord-fingering-block">
-                                                {current && user && current.userId === user.id && (
-                                                    <div className="chord-fingering-actions chord-fingering-actions--top">
-                                                        <button type="button" className="chord-fingering-action-btn" title="Редактировать" onClick={() => handleEditVariation(current, chord)}>
-                                                            <img src={editIcon} alt="Редактировать" />
-                                                        </button>
-                                                        <button type="button" className="chord-fingering-action-btn" title="Удалить" onClick={() => handleDeleteVariation(current.id, chord)}>
-                                                            <img src={xmarkIcon} alt="Удалить" />
-                                                        </button>
-                                                    </div>
-                                                )}
-                                                <div className="chord-fingering-title">{chord}</div>
-                                                <div className="chord-fingering-svg-wrapper">
-                                                    {current ? (
-                                                        <div className="chord-fingering-svg" dangerouslySetInnerHTML={{ __html: current.fingeringSVG }} />
-                                                    ) : (
-                                                        <span className="chord-fingering-no-variation">Нет вариаций</span>
-                                                    )}
-                                                </div>
-                                                <div className="chord-fingering-nav">
-                                                    <button type="button" className="chord-fingering-arrow" onClick={() => handlePrevVariation(chord)}>&lt;</button>
-                                                    <span className="chord-fingering-count">{variations.length > 0 ? `${idx + 1} из ${variations.length}` : "-"}</span>
-                                                    <button type="button" className="chord-fingering-arrow" onClick={() => handleNextVariation(chord)}>&gt;</button>
-                                                </div>
-                                            </div>
+                                            <ChordFingeringBlock
+                                                key={chordObj.id}
+                                                chord={chordObj}
+                                                variations={variations}
+                                                idx={idx}
+                                                onPrev={() => handlePrevVariation(chordName)}
+                                                onNext={() => handleNextVariation(chordName)}
+                                                onEdit={(variation, chordName) => handleEditVariation(variation, chordName)}
+                                                onDelete={handleDeleteVariation}
+                                                user={user}
+                                                currentUserId={user?.id}
+                                            />
                                         );
                                     })}
                                 </div>

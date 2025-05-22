@@ -66,5 +66,13 @@ namespace Chordy.WebApi.Controllers
             var authors = await authorService.SearchAuthorsByNameAsync(query, cancellationToken);
             return Ok(authors);
         }
+
+        [HttpDelete("{id:int}/avatar")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> DeleteAvatarAsync([FromRoute] int id, CancellationToken cancellationToken)
+        {
+            var updated = await authorService.DeleteAvatarAsync(id, cancellationToken);
+            return Ok(updated);
+        }
     }
 }
